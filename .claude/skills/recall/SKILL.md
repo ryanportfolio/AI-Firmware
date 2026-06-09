@@ -57,6 +57,7 @@ When the user wants to save a learning:
 3. **Date format:** today's date. Check the conversation context's `# currentDate` block first; otherwise run `date +%Y-%m-%d`.
 4. **If creating a new topic file,** also add a row to the index table in CLAUDE.md's "Project Reference Library" section so future sessions discover it.
 5. **Commit on the current branch** with a message like `recall: <short title>`. Don't bundle unrelated changes.
+6. **Generic-check.** If the lesson would bite ANY project — tooling/shell/git traps, Claude Code behavior quirks, workflow improvements — say so and offer to push it to the claude-starter template via `/sync-starter` (Direction B). Capture locally either way; push-back is additive, not instead-of. Project-specific lessons (this stack, this deploy target, this codebase) stay local — don't offer.
 
 ## Step 3: Stay disciplined
 
