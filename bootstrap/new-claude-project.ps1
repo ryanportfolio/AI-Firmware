@@ -1,4 +1,4 @@
-# new-claude-project.ps1 — spin up a new project from the claude-starter template.
+# new-claude-project.ps1 - spin up a new project from the claude-starter template.
 #
 # What it does:
 #   1. Prompts for a project name (or takes it as -Name).
@@ -23,7 +23,7 @@ if (-not $Name) {
     $Name = Read-Host "New project name (kebab-case, becomes folder + repo name)"
 }
 if (-not $Name -or $Name -notmatch '^[a-zA-Z0-9._-]+$') {
-    Write-Host "Invalid name '$Name' — letters, digits, dot, dash, underscore only." -ForegroundColor Red
+    Write-Host "Invalid name '$Name' - letters, digits, dot, dash, underscore only." -ForegroundColor Red
     exit 1
 }
 
@@ -37,7 +37,8 @@ if (-not (Test-Path $Dest)) { New-Item -ItemType Directory -Force $Dest | Out-Nu
 $ghOk = $false
 try {
     $null = Get-Command gh -ErrorAction Stop
-    gh auth status 2>$null | Out-Null
+    # cmd /c swallows gh's stderr without PS 5.1 wrapping it in ErrorRecords
+    cmd /c "gh auth status >nul 2>&1"
     if ($LASTEXITCODE -eq 0) { $ghOk = $true }
 } catch {}
 
@@ -45,7 +46,7 @@ if ($ghOk) {
     Write-Host "Creating private repo '$Name' from template $Template ..." -ForegroundColor Cyan
     gh repo create $Name --template $Template --private --clone
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "gh repo create failed — falling back to local copy." -ForegroundColor Yellow
+        Write-Host "gh repo create failed - falling back to local copy." -ForegroundColor Yellow
         $ghOk = $false
     } else {
         # gh clones into .\$Name relative to cwd; move it to the destination if different
@@ -53,8 +54,10 @@ if ($ghOk) {
         if ($cloned -ne $target -and (Test-Path $cloned)) { Move-Item $cloned $target }
         # Strip template-only files from the new project
         Push-Location $target
-        if (Test-Path 'bootstrap') { git rm -rq bootstrap 2>$null; if (Test-Path 'bootstrap') { Remove-Item -Recurse -Force bootstrap } }
-        if (Test-Path 'README.md') { git rm -q README.md 2>$null; if (Test-Path 'README.md') { Remove-Item -Force README.md } }
+        git rm -rq --ignore-unmatch bootstrap
+        git rm -q --ignore-unmatch README.md
+        if (Test-Path 'bootstrap') { Remove-Item -Recurse -Force bootstrap }
+        if (Test-Path 'README.md') { Remove-Item -Force README.md }
         if (-not (git status --porcelain)) {
             Write-Host "Nothing to clean up." -ForegroundColor DarkGray
         } else {
@@ -73,7 +76,7 @@ if ($ghOk) {
 }
 
 # ---- Fallback: no gh / not authed / create failed -> local copy + manual steps ----
-Write-Host "gh CLI unavailable — building the project locally instead." -ForegroundColor Yellow
+Write-Host "gh CLI unavailable - building the project locally instead." -ForegroundColor Yellow
 $localTemplate = Split-Path -Parent $PSScriptRoot   # repo root containing this script
 
 Write-Host "Copying template from $localTemplate ..." -ForegroundColor Cyan
