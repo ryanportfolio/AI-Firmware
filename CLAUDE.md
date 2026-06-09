@@ -40,6 +40,7 @@ Defaults until configured:
 - Scratch work → `.tmp/` (gitignored). Promote to `scripts/` if reusable; otherwise delete.
 - Durable project knowledge → `.claude/reference/` via `/recall save` (committed, travels to every machine and sandbox). Auto-memory is per-machine and supplementary — never a learning's only home.
 - Welcome correction. Confident-sounding mistakes happen; don't defend wrong answers.
+- Restraint is a feature. New kernel rules, skills, and reference entries must earn their place — prefer pruning stale content over accreting. More ≠ better.
 
 ## Subagents: direct-by-default, never Haiku
 
