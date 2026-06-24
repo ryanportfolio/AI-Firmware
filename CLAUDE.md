@@ -41,6 +41,7 @@ Defaults until configured:
 - Durable project knowledge → `.claude/reference/` via `/recall save` (committed, travels to every machine and sandbox). Auto-memory is per-machine and supplementary — never a learning's only home.
 - Welcome correction. Confident-sounding mistakes happen; don't defend wrong answers.
 - Restraint is a feature. New kernel rules, skills, and reference entries must earn their place — prefer pruning stale content over accreting. More ≠ better.
+- Don't restate what the harness already injects every turn (the available-skills list, the environment block, tool-doc behavior). It reloads for free; repeating it in the kernel is pure waste. Keep only the project's value-add. Always-loaded files (this kernel, indexes) = thin hooks; full detail lives in `.claude/reference/` subfiles, loaded on demand. See `/optimize-context`.
 
 ## Subagents: direct-by-default, never Haiku
 
@@ -80,6 +81,6 @@ Topical reference lives in `.claude/reference/`. Consult BEFORE non-trivial work
 | `tech-stack.md` | Non-default picks + why |
 | `deployment.md` | Deploy target, artifacts |
 
-New quirk bites → `/recall save <text>`. Skills live in `.claude/skills/` (notably `recall`, `init-project`, `sync-starter`, `safe-ship`, `pr`, `impartial-review`, `lab`, `learning`, `enhance-prompt`).
+New quirk bites → `/recall save <text>`.
 
 Stays in this file: cross-cutting safety/process rules. Moves out: anything area-specific — don't bloat the kernel.
