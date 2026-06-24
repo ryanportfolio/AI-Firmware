@@ -54,5 +54,24 @@
       "Bash(gh issue view *)",
       "Bash(gh issue list *)"
     ]
+  },
+  "skillOverrides": {
+    "anthropic-skills:adjuvant-book-research": "off",
+    "anthropic-skills:algorithmic-art": "off",
+    "anthropic-skills:book-writing": "off",
+    "anthropic-skills:canvas-design": "off",
+    "anthropic-skills:docx": "off",
+    "anthropic-skills:enhance-prompt": "off",
+    "anthropic-skills:excel-macro": "off",
+    "anthropic-skills:fibrinaloid-research-review": "off",
+    "anthropic-skills:humanize": "off",
+    "anthropic-skills:impartial-review": "off",
+    "anthropic-skills:pdf": "off",
+    "anthropic-skills:pptx": "off",
+    "anthropic-skills:setup-cowork": "off",
+    "anthropic-skills:skill-creator": "off",
+    "anthropic-skills:skills-creator": "off",
+    "anthropic-skills:web-artifacts-builder": "off",
+    "anthropic-skills:xlsx": "off"
   }
 }
