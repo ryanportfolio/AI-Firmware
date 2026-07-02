@@ -1,0 +1,11 @@
+{
+  "name": "claude-starter",
+  "displayName": "Claude Starter Skills",
+  "version": "1.0.0",
+  "description": "The claude-starter skill set without cloning the template: workflow (recall, caveman, safe-ship, pr, merge), discipline (systematic-debugging, TDD, verification-before-completion, impartial-review, brainstorming, plans), and craft (impeccable frontend design, humanizer) skills.",
+  "author": { "name": "Aoh1578", "url": "https://github.com/Aoh1578" },
+  "repository": "https://github.com/Aoh1578/claude-starter",
+  "homepage": "https://github.com/Aoh1578/claude-starter",
+  "keywords": ["starter", "workflow", "skills", "template", "tdd", "debugging", "frontend"],
+  "skills": "./.claude/skills/"
+}

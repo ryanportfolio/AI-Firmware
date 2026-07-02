@@ -47,3 +47,8 @@ jobs:
 
       - name: settings.json is valid JSON
         run: python3 -m json.tool .claude/settings.json > /dev/null
+
+      - name: plugin manifests are valid JSON
+        run: |
+          python3 -m json.tool .claude-plugin/plugin.json > /dev/null
+          python3 -m json.tool .claude-plugin/marketplace.json > /dev/null

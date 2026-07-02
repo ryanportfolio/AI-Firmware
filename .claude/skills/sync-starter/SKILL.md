@@ -53,7 +53,8 @@ When a skill fix / new skill / hook improvement made in THIS project is generic 
    - If this machine has the template checked out locally (e.g. `~/CoreWise/claude-starter`), apply the change there directly.
    - Otherwise clone it to scratch: `git clone https://github.com/Aoh1578/claude-starter .tmp/claude-starter`, apply, push from there.
 3. Commit to the template on a branch, push, open the PR (or commit to main directly if the user says so — template is solo-maintained).
-4. Mention that other spawned projects pick it up via Direction A.
+4. **Bump the plugin version** when the change touches the shared surface (`.claude/skills`, `.claude/hooks`, `.claude/settings.json`): edit `version` in the template's `.claude-plugin/plugin.json` — patch for fixes, minor for new skills. Plugin installs only receive updates when this number changes; spawned projects get changes via Direction A regardless.
+5. Mention that other spawned projects pick it up via Direction A.
 
 ## Anti-patterns
 

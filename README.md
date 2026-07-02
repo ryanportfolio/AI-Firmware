@@ -14,6 +14,20 @@ A batteries-included Claude Code project template: the workflow skills, referenc
 - **`.claude/hooks/session-start.sh`** — auto-rebase onto origin/main (cloud), read-only fetch (local), caveman directive + universal-skills reminder injection.
 - **`.claude/settings.json`** — hook wiring + read-only Bash permission allowlist.
 - **`bootstrap/`** — the one-click project creator (template-only; removed from spawned projects).
+- **`.claude-plugin/`** — plugin + marketplace manifests so the skill set is installable without cloning (template-only).
+
+## Installing the skills as a plugin (no clone)
+
+Want the skills in an existing project without adopting the whole template? This repo doubles as a plugin marketplace:
+
+```
+/plugin marketplace add Aoh1578/claude-starter
+/plugin install claude-starter@claude-starter
+```
+
+Plugin skills are namespaced (`/claude-starter:recall`, `/claude-starter:caveman`, …). The plugin ships **skills only** — the kernel `CLAUDE.md`, hooks, and reference library come with the template path below.
+
+**Don't install the plugin into a project spawned from this template** — those already have the skills under `.claude/skills/` and you'd get duplicates.
 
 ## Creating a new project
 

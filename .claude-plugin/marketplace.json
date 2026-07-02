@@ -1,0 +1,13 @@
+{
+  "name": "claude-starter",
+  "owner": { "name": "Aoh1578" },
+  "description": "Hosts the claude-starter skills plugin — install the template's full skill set into any project.",
+  "plugins": [
+    {
+      "name": "claude-starter",
+      "source": "./",
+      "category": "workflow",
+      "tags": ["starter", "workflow", "skills"]
+    }
+  ]
+}
