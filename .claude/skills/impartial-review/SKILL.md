@@ -85,6 +85,7 @@ This is the single highest-leverage category and gets its own dedicated reviewer
 - Renamed something but left old references (search the diff for the old name)
 - Added handling for the success path but not the error path (or vice versa)
 - Added a test but didn't run the suite that includes it
+- Added docs/README text asking a HUMAN to maintain an invariant ("don't install X alongside Y", "remember to replace these refs") — a disclaimer that could be a detection hook or a script is a finding: automate it or explain why it can't be
 
 For this bucket specifically: greppability beats cleverness. The agent should `grep` the changed identifiers across the codebase and look at every hit to see if anything was missed.
 
