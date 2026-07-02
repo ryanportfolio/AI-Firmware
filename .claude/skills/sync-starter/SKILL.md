@@ -20,7 +20,7 @@ git fetch starter
 Only these paths are sync candidates:
 
 ```
-git diff --stat HEAD starter/main -- .claude/skills .claude/hooks .claude/commands .claude/settings.json
+git diff --stat HEAD starter/main -- .claude/skills .claude/hooks .claude/settings.json
 ```
 
 **Diverged-by-design — NEVER bulk-pull these:**

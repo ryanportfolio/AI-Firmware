@@ -123,7 +123,7 @@ check_starter_drift() {
 
   local changed
   changed=$(git diff --name-only HEAD "$ref" -- \
-    .claude/skills .claude/hooks .claude/commands .claude/settings.json \
+    .claude/skills .claude/hooks .claude/settings.json \
     ':(exclude).claude/skills/applying-best-practices' 2>/dev/null) || return 0
   if [ -z "$changed" ]; then
     return 0
