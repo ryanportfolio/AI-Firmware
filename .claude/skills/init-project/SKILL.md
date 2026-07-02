@@ -1,5 +1,5 @@
 ---
-description: One-time first-session setup for a project spawned from the claude-starter template. Use when the user says /init-project, "set up this project", "configure the starter", "initialize the template" — or proactively when you notice CLAUDE.md still contains "FILL IN" template markers at the start of a session. Detects the stack from the scaffold, fills CLAUDE.md's FILL IN sections via a short Q&A, seeds the reference files, tunes the best-practices catalog to the stack, removes template notes, and commits.
+description: One-time first-session setup for a project spawned from the claude-starter template. Use when the user says /init-project, "set up this project", "configure the starter", "initialize the template" — or proactively when you notice CLAUDE.md still contains "FILL IN" template markers at the start of a session. Detects the stack, picks a profile (web / backend / data / writing) that prunes irrelevant skills, fills CLAUDE.md's FILL IN sections via a short Q&A, seeds the reference files, tunes the best-practices catalog, removes template artifacts, and commits.
 ---
 
 # init-project — configure a freshly spawned starter project
@@ -23,10 +23,11 @@ If the repo is EMPTY (fresh spawn, no app code yet), that's fine — note it and
 
 Plain chat, numbered (popup tools are banned). Only ask what's actually unknown — skip questions the scaffold already answered:
 
-1. **Deploy target:** where will this run? (host/platform, database, where secrets live)
-2. **Sandbox capabilities:** can sessions in this environment run installs, builds, type-checks, tests meaningfully? Can the user reach a dev server the session starts? Is there a browser?
-3. **Authoritative verification:** what's the final word that a change works — local test suite, CI, a deploy log?
-4. **Hard lines:** anything that must ALWAYS go through the user (installs, migrations, deploys, destructive ops)?
+1. **Profile:** which best describes this project — **web-app** (has UI), **backend/CLI/library** (code, no UI), **data/notebooks**, or **writing/docs**? Lead with the guess detection supports ("scaffold says web-app — confirm?"), only truly ask when the repo is empty.
+2. **Deploy target:** where will this run? (host/platform, database, where secrets live)
+3. **Sandbox capabilities:** can sessions in this environment run installs, builds, type-checks, tests meaningfully? Can the user reach a dev server the session starts? Is there a browser?
+4. **Authoritative verification:** what's the final word that a change works — local test suite, CI, a deploy log?
+5. **Hard lines:** anything that must ALWAYS go through the user (installs, migrations, deploys, destructive ops)?
 
 If the user doesn't know yet (brand-new project), write the honest default: "not yet decided — ask before installs/migrations/deploys" and move on. Don't stall setup on undecided infrastructure.
 
@@ -35,6 +36,7 @@ If the user doesn't know yet (brand-new project), write the honest default: "not
 - Replace the **verification** FILL IN section with the real answer from Step 2 (what this sandbox can/can't verify, what the authoritative signal is, what to flag-as-risk instead of claim).
 - Replace the **Environment & Deploy Target** FILL IN section with the deploy target, install policy, migration policy, and hard lines.
 - Delete the `STARTER TEMPLATE NOTE` comment block and every `FILL IN` comment.
+- Delete `.claude-plugin/` — template-only plugin/marketplace manifests; a spawned project is not the marketplace.
 - Keep the section structure — future sessions navigate by those headings.
 
 ## Step 4: Seed the reference files
@@ -44,9 +46,20 @@ If the user doesn't know yet (brand-new project), write the honest default: "not
 - `deployment.md` — the deploy answers from Step 2.
 - Leave `pitfalls.md` / `architecture.md` / `secrets.md` skeletal — they fill organically via `/recall save`.
 
-## Step 5: Tune applying-best-practices
+## Step 5: Apply the profile — prune skills + tune best-practices
 
-Open `.claude/skills/applying-best-practices/SKILL.md`. The catalog ships as a generic web/TS baseline:
+**Skill pruning.** The profile from Step 2 disables skills that will never fire in this project, via `skillOverrides` in committed `.claude/settings.json` (`"off"` = hidden from the picker AND the per-turn skills list; re-enable any time by removing the key). Project skills use the bare directory name as the key:
+
+| Profile | Disable (`"off"`) |
+|---|---|
+| web-app | — (full set) |
+| backend / CLI / library | `impeccable`, `lab` |
+| data / notebooks | `impeccable`, `lab` |
+| writing / docs | `impeccable`, `lab`, `test-driven-development`, `subagent-driven-development` |
+
+The table is a floor, not a ceiling — offer obvious extras ("no frontend planned, also drop `humanizer`? it's for prose deliverables"). Each `off` saves its description from every turn (`bash .claude/scripts/context-weight.sh` shows per-skill weight); takes effect next session.
+
+**Best-practices catalog.** Open `.claude/skills/applying-best-practices/SKILL.md` — it ships as a generic web/TS baseline:
 
 - Non-web or non-JS project → cut the React/bundle/query-cache sections entirely; keep the discipline section and the Async/IO + JS-perf generics that still apply (or their ecosystem equivalents).
 - Web project → trim to the actual stack (e.g. drop query-cache rules if there's no query library yet; note the framework's idioms).
