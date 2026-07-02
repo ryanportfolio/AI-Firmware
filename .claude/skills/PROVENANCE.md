@@ -34,5 +34,4 @@ LICENSE/NOTICE files in the skill folder.
 `merge`, `optimize-context`, `pr`, `recall`, `safe-ship`, `sync-starter`,
 `why`.
 
-Homegrown skills carry the repo's license (to be added before the repo goes
-public).
+Homegrown skills are MIT, same as the repo (see the root `LICENSE`).
