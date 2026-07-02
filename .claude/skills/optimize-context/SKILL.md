@@ -22,15 +22,17 @@ Each connected MCP server injects its tool-name list AND any instruction block i
 - Account/marketplace connectors (claude.ai → Settings → Connectors) are **account-level** — `claude mcp remove` can't touch them (they re-sync); the user toggles them in the UI. Reversible (reconnect anytime).
 - This is the user's action, not a file edit. Identify the dead weight, name it, let them disconnect. Flag if a disconnect removes a capability the project sometimes needs (e.g. Context7 live docs → say so when you'd have used it).
 
-### 2. Bundled / marketplace skills — `skillOverrides`
-The harness injects every installed skill's name + description every turn. Disable unused ones in **committed** `.claude/settings.json`:
+### 2. Skill visibility — `skillOverrides` (project/bundled skills ONLY)
+The harness injects every visible skill's name + description every turn. Hide unused **project or bundled** skills in **committed** `.claude/settings.json`:
 ```json
-"skillOverrides": { "anthropic-skills:docx": "off" }
+"skillOverrides": { "lab": "off" }
 ```
-- Values (verified vs the settings schema): `on` | `name-only` | `user-invocable-only` | `off`. **`off`** fully hides (name + description gone, not in the `/` picker).
-- **Key format = the runtime skill id.** Bundled/marketplace skills are `plugin:skill` with a **COLON** (verify via `~/.claude.json` `skillUsage` keys, e.g. `superpowers:writing-skills`). Project `.claude/skills/` skills use the **bare** dir name.
-- **Dupes matter:** if a name exists as BOTH a project skill (bare) and a marketplace one (`plugin:`), disabling the bare id kills your project version too. Namespace the override to hit only the marketplace copy.
-- `off` takes effect **next session**, project-scoped only.
+- Values (schemastore-verified): `on` | `name-only` | `user-invocable-only` | `off`. **`off`** = gone from Claude's context AND the `/` picker.
+- **Keys are BARE skill names** (the project skill's directory name).
+- **PLUGIN SKILLS ARE NOT AFFECTED — hard limitation, schema-explicit.** Any key targeting a plugin skill (colon-prefixed or bare) is a silent no-op; 17 such keys sat in this template as dead config until 2026-07. Trim plugin skills at their source instead:
+  - Account-synced skills plugins (`@inline`, from claude.ai) → disable the individual skills or the sync in claude.ai settings. Per-account, not a repo file.
+  - Marketplace plugins → `claude plugin disable <name>` (all projects) or uninstall. No per-project plugin disable exists.
+- `off` takes effect **next session**. Scope precedence: `settings.local.json` > project `settings.json` > `~/.claude/settings.json`.
 
 ### 3. Kernel (CLAUDE.md) + index (MEMORY.md) compression
 - **Caveman-ultra the prose**, keep every rule exact.
@@ -46,7 +48,7 @@ The harness injects every installed skill's name + description every turn. Disab
 
 ## Gotchas (burned in)
 - **Durable vs ephemeral carrier:** a rule that looks duplicated by a SessionStart-hook message is NOT safe to cut — hook output is a one-time early message (droppable at compaction); CLAUDE.md re-injects every turn, so the kernel is the durable home (e.g. the caveman default stays in CLAUDE.md).
-- **Verify the skill-id separator** against `skillUsage` before writing a `skillOverrides` key — a wrong key is a silent no-op.
+- **`skillOverrides` is a silent no-op for plugin skills** — no error, the skill just keeps loading. A `skillUsage` entry like `superpowers:writing-skills` proves the skill RAN, not that an override key in that form works. Verify a disable by checking the skills list in a NEXT session, never by the write succeeding.
 - **Don't trust an agent's schema claim un-verified** — confirm enum values / property names against the real schema (`schemastore.org/claude-code-settings.json`) or the running config.
 
 ## Propagation to claude-starter
