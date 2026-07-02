@@ -58,7 +58,13 @@ Machine-level `~/.claude` files (global CLAUDE.md, keybindings, personal skills)
 
 ## Forking this template
 
-Replace the upstream references with your own fork's (all functional, all findable with one grep for `Aoh1578`): the template repo id in `sync-starter` and `init-project` skills, the drift-check URL in `session-start.sh`, the defaults in `bootstrap/new-claude-project.ps1`, and the plugin manifests in `.claude-plugin/`.
+One command retargets every functional upstream reference (template repo id in the skills, drift-check URL in the hook, bootstrap defaults, plugin manifests) to your fork:
+
+```
+bash bootstrap/retarget-fork.sh <you>/<your-fork>
+```
+
+Review the diff and commit. LICENSE attribution is left untouched, and the script verifies nothing was missed.
 
 ## Provenance & license
 
