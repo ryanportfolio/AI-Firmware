@@ -70,6 +70,7 @@ Always include:
 - **Format if structured output expected** (table layout, severity-tagged list, JSON shape, fenced sections with specific headings)
 - **Verification step** — type-check, screenshot, dry-run script — matched to task
 - **Scope guards** — common: "don't refactor unrelated files", "don't add tests unless asked", "don't install packages without confirmation", "don't change user-facing copy outside the listed strings". Gold-plating-prone task → add: "keep the solution minimal — no extra abstractions, configurability, or defensive code beyond what the task needs."
+- **Escape hatch** — receiver hits genuine blocker (missing access, contradictory requirement, `<TODO>` unresolved) → should stop and ask, not guess. One line: "If anything here is ambiguous or blocked, ask before proceeding rather than guessing."
 
 ## 6: Bake in project constraints
 
@@ -95,7 +96,11 @@ Prompt must work regardless of executor.
 
 Receiver uses own tools. Give the *what*; prescribe the *how* only when the *how* is itself the point.
 
-## 8: Output format
+## 8: Self-review pass
+
+Draft done → reread once as the cold receiver. Colleague test: minimal-context colleague confused anywhere → rewrite that line. Then per sentence: changes receiver behavior? No → cut. Catch leftover conversation-context leaks ("as discussed", "the file we looked at") — receiver has none.
+
+## 9: Output format
 
 One outer-fenced markdown block, copied verbatim. Four backticks outer so triple-backtick blocks inside render:
 
