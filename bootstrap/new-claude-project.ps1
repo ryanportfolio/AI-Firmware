@@ -13,7 +13,7 @@
 
 param(
     [string]$Name,
-    [string]$Dest = "$HOME\code",
+    [string]$Dest = "$HOME\CoreWise",
     [string]$Template = "ryanportfolio/claude-starter"
 )
 
