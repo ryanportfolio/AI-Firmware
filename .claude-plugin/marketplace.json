@@ -1,6 +1,6 @@
 {
   "name": "claude-starter",
-  "owner": { "name": "Aoh1578" },
+  "owner": { "name": "ryanportfoilio" },
   "description": "Hosts the claude-starter skills plugin. Install the template's full skill set into any project.",
   "plugins": [
     {

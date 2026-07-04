@@ -6,6 +6,7 @@ name: validate-template
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 jobs:

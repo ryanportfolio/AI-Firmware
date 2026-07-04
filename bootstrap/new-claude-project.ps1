@@ -14,7 +14,7 @@
 param(
     [string]$Name,
     [string]$Dest = "$HOME\code",
-    [string]$Template = "Aoh1578/claude-starter"
+    [string]$Template = "ryanportfoilio/claude-starter"
 )
 
 $ErrorActionPreference = 'Stop'

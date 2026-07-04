@@ -117,7 +117,7 @@ check_starter_drift() {
   else
     # No named remote (fresh clone / cloud sandbox): try a direct fetch.
     # Fails silently when the repo is unreachable or auth is unavailable.
-    git fetch --quiet https://github.com/Aoh1578/claude-starter.git main 2>/dev/null || return 0
+    git fetch --quiet https://github.com/ryanportfoilio/claude-starter.git main 2>/dev/null || return 0
     ref="FETCH_HEAD"
   fi
 

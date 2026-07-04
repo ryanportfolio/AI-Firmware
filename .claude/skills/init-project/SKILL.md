@@ -72,7 +72,7 @@ If `README.md` is the spawn stub (`# <name>` only), ask the user for a one-line 
 ## Step 7: Wire the starter remote
 
 ```
-git remote get-url starter || git remote add starter https://github.com/Aoh1578/claude-starter.git
+git remote get-url starter || git remote add starter https://github.com/ryanportfoilio/claude-starter.git
 ```
 
 This pre-wires `/sync-starter` and lets the session-start hook surface template drift ("starter differs on N files"). Remotes are local git config, not committed — mention that a new clone on another machine needs this line re-run (or the hook's URL-fallback fetch covers it when credentials allow).

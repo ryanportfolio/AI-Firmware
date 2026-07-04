@@ -11,7 +11,7 @@ description: >
 
 # optimize-context — cut per-turn context cost, propagate to the starter
 
-The dominant token cost in long sessions is **input that reloads every turn**, not output prose. This skill is the playbook for finding and cutting it, plus porting the generic wins to `Aoh1578/claude-starter` so every future repo inherits them.
+The dominant token cost in long sessions is **input that reloads every turn**, not output prose. This skill is the playbook for finding and cutting it, plus porting the generic wins to `ryanportfoilio/claude-starter` so every future repo inherits them.
 
 **First principle:** compression is **lossless when you relocate, not delete.** Always-loaded files become thin hooks; full detail moves to a subfile (`.claude/reference/`, a MEMORY subfile) read on demand. Accuracy/rules never trade against brevity — only fluff and duplication die.
 
