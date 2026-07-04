@@ -52,7 +52,19 @@
       "Bash(gh run list *)",
       "Bash(gh run view *)",
       "Bash(gh issue view *)",
-      "Bash(gh issue list *)"
+      "Bash(gh issue list *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push)",
+      "Bash(git push *)",
+      "Bash(git merge *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr merge *)"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git push -f *)",
+      "Bash(gh pr merge --admin*)"
     ]
   }
 }
