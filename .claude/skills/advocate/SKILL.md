@@ -1,83 +1,83 @@
 ---
-description: Devil's advocate on a change you just made — argue the honest case AGAINST it. "Any reason not to?" A deliberate second-thoughts pass on the diff in front of you, before it lands. Surfaces scope creep, blast radius, irreversibility, a simpler path you skipped, YAGNI, or "this doesn't belong in this change" — the doubts your build-momentum buries. ONLY use when the user explicitly types the `/advocate` slash command. Reviews the change(s) just made (uncommitted diff by default, or an argument-scoped slice). Dispatches one fresh Opus subagent as a devil's advocate, fed only the diff and its stated goal, to build the counter-case with genuine distance, then synthesizes a keep / revise / drop verdict. Lightweight — one scoped skeptic, not the multi-agent /impartial-review, and not a bug hunt.
+description: Devil's advocate on change just made — argue honest case AGAINST before it lands. "Any reason not to?" Deliberate second-thoughts pass on diff in front of you. Surfaces scope creep, blast radius, irreversibility, simpler path skipped, YAGNI, "doesn't belong in this change" — doubts build-momentum buries. ONLY use when user explicitly types `/advocate` slash command. Reviews change(s) just made (uncommitted diff default, or arg-scoped slice). Dispatches 1 fresh Opus subagent as devil's advocate, fed only diff + stated goal, builds counter-case with distance, synthesizes keep / revise / drop verdict. Lightweight — 1 scoped skeptic, not multi-agent /impartial-review, not a bug hunt.
 disable-model-invocation: true
 ---
 
 # Advocate — any reason not to?
 
-The user typed `/advocate`. They (or you) just made a change and, before it lands, want the devil's-advocate case: **any reason not to do this?** Not "is it buggy" — assume it works. The question is whether the change should exist, in this form, in this scope, at all.
+User typed `/advocate`. Just made change → before it lands, want devil's-advocate case: **any reason not to do this?** Not "is it buggy" — assume works. Q = should change exist, in this form, this scope, at all?
 
-You made the change. Your bias is to keep it. This skill exists to fight that bias on purpose.
+You made change → bias = keep it. Skill exists to fight that bias on purpose.
 
-**Trigger:** runs ONLY on the explicit `/advocate` command — slash-only, model auto-invocation disabled in the frontmatter. Don't fire on the word "advocate" in ordinary conversation.
+**Trigger:** ONLY explicit `/advocate` command — slash-only, model auto-invocation disabled in frontmatter. Don't fire on word "advocate" in normal talk.
 
-## How this differs from neighbors
+## How differs from neighbors
 
-- **`/why`** pressure-tests a *recommendation* (a pick, advice) and stays well-rounded — both sides. `/advocate` pressure-tests a *change already made* and leans adversarial: the case against, because your confirmation bias already argues the case for.
-- **`/impartial-review` / `/code-review`** hunt *bugs* in the diff. `/advocate` assumes the code is correct and asks whether it should ship — a judgment call, not a defect scan. If it turns up an actual bug in passing, name it and point at the bug-hunt skills; don't turn into one.
-- **`/verification-before-completion`** runs the checks. `/advocate` questions the change itself, not whether tests pass.
+- **`/why`** → pressure-tests a *recommendation* (pick, advice), stays well-rounded (both sides). `/advocate` → pressure-tests a *change already made*, leans adversarial: case against, since confirmation bias already argues case for.
+- **`/impartial-review` / `/code-review`** → hunt *bugs* in diff. `/advocate` → assumes code correct, asks whether it should ship — judgment call, not defect scan. Turns up real bug in passing → name it, point at bug-hunt skills; don't become one.
+- **`/verification-before-completion`** → runs checks. `/advocate` → questions change itself, not whether tests pass.
 
 ## Step 1: Lock onto what's under review
 
-- **Default: the change(s) just made** — the uncommitted working diff. Run `git status --short` and `git diff` (plus `git diff --staged`) to see it. If the working tree is clean, fall back to the most recent commit (`git show HEAD`) — the change just landed and the doubt is still worth voicing.
-- If the user passed an argument (`/advocate the retry logic`, `/advocate the new dependency`), let it scope or redirect to that slice of the diff. Honor the argument over the default.
-- If there is **no change to review** (clean tree, no relevant recent commit), say so in one line and stop. Don't invent a change to second-guess.
-- Before anything else, get the change's **goal** clear in your own words: what problem it solves, why it was made. The counter-case is only fair if it's arguing against the real intent, not a strawman.
+- **Default: change(s) just made** — uncommitted working diff. `git status --short` + `git diff` (+ `git diff --staged`). Clean tree → fall back to latest commit (`git show HEAD`); change just landed, doubt still worth voicing.
+- User passed arg (`/advocate the retry logic`, `/advocate the new dependency`) → scope/redirect to that slice. Arg beats default.
+- **No change to review** (clean tree, no relevant recent commit) → say so in 1 line, stop. Don't invent a change to second-guess.
+- First: get change's **goal** clear in own words — what problem it solves, why made. Counter-case only fair if arguing real intent, not a strawman.
 
-Open the final review with a single line restating what changed and its goal, so the user can confirm you're aimed right.
+Open review with 1 line restating what changed + goal → user confirms you're aimed right.
 
-## Step 2: Get fresh eyes on the case against
+## Step 2: Fresh eyes on the case against
 
-Dispatch **one** subagent via the Agent tool — an independent devil's advocate. A model reviewing its own change rubber-stamps; the whole value of "any reason not to?" is distance the self-review can't manufacture.
+Dispatch **one** subagent via Agent tool — independent devil's advocate. Model reviewing own change rubber-stamps; whole value of "any reason not to?" = distance self-review can't fake.
 
-- **Model:** the Agent tool's `opus` model (currently Opus 4.8). **Type:** `general-purpose`, fresh context.
-- **Feed it only:** the diff under review (or the scoped slice) and a one-line statement of the change's goal. Do **not** paste the conversation or unrelated history. Minimal context is the point.
-- **Ask it to build the strongest honest case *against* keeping this change**, specifically:
-  - **Scope** — does this do more than the goal needs? Unrequested refactor, extra abstraction, defensive code, drive-by edits that belong in a separate change.
-  - **Necessity** — does the change need to exist at all? Is it solving a symptom instead of the cause? Would doing nothing be defensible?
-  - **Blast radius** — what else does this touch or break assumptions for? Callers, config, other environments, public API, on-disk/DB state.
-  - **Reversibility** — how expensive is it to undo once it lands? A migration, a format change, a dependency added, a name others will build on.
-  - **Simpler path** — was there a smaller or more local change that hits the same goal with less surface?
+- **Model:** Agent tool `opus` (currently Opus 4.8). **Type:** `general-purpose`, fresh context.
+- **Feed only:** diff under review (or scoped slice) + 1-line statement of goal. Do **not** paste conversation / unrelated history. Minimal context = the point.
+- **Ask for strongest honest case *against* keeping this change**, specifically:
+  - **Scope** — does more than goal needs? Unrequested refactor, extra abstraction, defensive code, drive-by edits belonging in a separate change.
+  - **Necessity** — need to exist at all? Solving a symptom not the cause? Doing nothing defensible?
+  - **Blast radius** — what else touched / assumptions broken? Callers, config, other envs, public API, on-disk/DB state.
+  - **Reversibility** — cost to undo once landed? Migration, format change, dep added, a name others build on.
+  - **Simpler path** — smaller / more local change hitting same goal, less surface?
   - **Wrong-place / wrong-time** — right idea, wrong PR / wrong layer / premature (YAGNI).
-  - Tell it to be specific and skeptical, cite the diff, and **not** restate what the change does approvingly. One or two cheap greps/reads are fine to ground a claim; no deep repo spelunking.
-- **One agent only.** If dispatch fails or it returns nothing useful, build the counter-case yourself — don't block on it.
+  - Be specific + skeptical, cite diff, **not** restate approvingly. 1-2 cheap greps/reads OK to ground a claim; no deep repo spelunking.
+- **One agent only.** Dispatch fails / nothing useful → build counter-case yourself, don't block.
 
-Then **you** own the synthesis: drop anything off-base (the agent lacks full repo/project context), keep what lands, fold it into the review below. Integrate — don't relay raw output.
+Then **you** own synthesis: drop off-base bits (agent lacks full repo/project context), keep what lands, fold into review below. Integrate — don't relay raw output.
 
-## Step 3: Check the change against project rules
+## Step 3: Check vs project rules
 
-Quickly, where relevant, confirm the change doesn't collide with this project's own constraints — these are concrete "reasons not to" the generic reviewer can't know:
+Quickly, where relevant → confirm change doesn't collide with project's own constraints — concrete "reasons not to" the generic reviewer can't know:
 
 - `CLAUDE.md` kernel rules (scope discipline, naming/copy policies, no unrequested refactors, migration/install policy).
-- The relevant `.claude/reference/` file for the area (`pitfalls.md`, `architecture.md`, etc.) via a quick read or `/recall`.
+- Relevant `.claude/reference/` file for the area (`pitfalls.md`, `architecture.md`, etc.) via quick read or `/recall`.
 
-A change that works but violates a project rule is a real reason not to ship it as-is. Flag it.
+Change works but violates a project rule = real reason not to ship as-is. Flag it.
 
 ## Step 4: Write the review
 
-One line restating the change + goal (Step 1), then:
+1 line restating change + goal (Step 1), then:
 
 ### The case against
 
-The meat. The honest reasons not to do this, sharpened by the fresh reviewer and the project-rule check. Lead with the strongest. Be specific to *this* diff — "adds `lodash` for one `groupBy` you could write in three lines, and it's the only dep in this package" beats "adds a dependency." If the case against is weak, say that plainly rather than manufacturing doubt.
+The meat. Honest reasons not to do this, sharpened by the fresh reviewer + project-rule check. Lead with strongest. Specific to *this* diff — "adds `lodash` for one `groupBy` you could write in 3 lines, and it's the only dep in this package" beats "adds a dependency." Case against weak → say so plainly, don't manufacture doubt.
 
-### Then, tight and conversational (no rigid headers):
+### Then tight + conversational (no rigid headers):
 
-- **Counter-weight** — the honest reasons the change *is* worth keeping despite the above. Keeps this from being contrarian theater. One or two lines.
-- **Cheaper alternative** — only if a real smaller path exists. One line: what it is, what it gives up.
-- **Verdict** — one line: **keep as-is / revise / drop**, with a confidence read and the one thing that would flip it. A calibrated "keep, but split the unrelated rename into its own change" beats a blanket thumbs-up or a reflexive "revert it."
+- **Counter-weight** — honest reasons the change *is* worth keeping despite the above. Stops contrarian theater. 1-2 lines.
+- **Cheaper alternative** — only if a real smaller path exists. 1 line: what it is, what it gives up.
+- **Verdict** — 1 line: **keep as-is / revise / drop** + confidence read + the 1 thing that flips it. Calibrated "keep, but split the unrelated rename into its own change" beats a blanket thumbs-up or reflexive "revert."
 
 ## Style
 
-- **Concise.** A handful of lines, not an essay. Cut anything that doesn't change how the user sees the change.
-- **Adversarial but honest.** The job is to voice the doubt build-momentum buried — but a change that genuinely should ship should get a clear "keep." Don't invent objections to look rigorous.
-- **Specific over generic.** No "consider the tradeoffs." Name the scope creep, the caller that breaks, the dependency, the simpler diff.
-- **Render in caveman *full*** (default intensity) even when the session runs caveman *ultra* — a review carries nuance that ultra mangles. Resume the session's mode after. If the session isn't in caveman at all, write plainly.
-- This skill **reviews — it does not implement.** No file edits while running it. If the verdict is revise or drop, that's a separate follow-up the user green-lights.
+- **Concise.** Handful of lines, not an essay. Cut anything not changing how user sees the change.
+- **Adversarial but honest.** Job = voice the doubt build-momentum buried — but a change that genuinely should ship gets a clear "keep." Don't invent objections to look rigorous.
+- **Specific > generic.** No "consider the tradeoffs." Name the scope creep, the caller that breaks, the dep, the simpler diff.
+- **Render in caveman *full*** (default intensity) even when session runs caveman *ultra* — a review carries nuance ultra mangles. Resume session mode after. Session not in caveman → write plainly.
+- Skill **reviews — does not implement.** No file edits while running. Verdict revise/drop → separate follow-up user green-lights.
 
 ## Worked example
 
-Change under review: *added a `retryWithBackoff` wrapper around every outbound HTTP call in `client.ts`; goal was to stop one flaky webhook from failing.* An ideal `/advocate` response (caveman full):
+Change under review: *added a `retryWithBackoff` wrapper around every outbound HTTP call in `client.ts`; goal was to stop one flaky webhook from failing.* Ideal `/advocate` response (caveman full):
 
 > **Change:** `retryWithBackoff` wrapped around all outbound calls in `client.ts`. Goal: stop one flaky webhook failing.
 >
@@ -90,14 +90,14 @@ Change under review: *added a `retryWithBackoff` wrapper around every outbound H
 >
 > **Verdict:** revise — scope down to the one call. High confidence. Flip to "keep" only if the goal was actually "make the whole client resilient," which it wasn't.
 
-Note the shape: restate → case against (the meat) → honest counter-weight → cheaper path → calibrated verdict. Short.
+Shape: restate → case against (meat) → honest counter-weight → cheaper path → calibrated verdict. Short.
 
 ## Anti-patterns
 
-- Firing on the word "advocate" outside the explicit `/advocate` command.
-- Turning into a bug hunt — that's `/impartial-review` / `/code-review`. `/advocate` assumes correctness and questions the *decision*.
-- Manufacturing objections so the review looks thorough. A clean change gets "keep."
-- Contrarian theater — only downsides, reflexive "revert." The counter-weight and a calibrated verdict are mandatory.
-- Feeding the subagent the whole conversation. Scope it to the diff + the goal, nothing more.
-- Implementing the revision while running the skill. Review, verdict, stop.
-- Generic caveats that fit any change ("weigh the tradeoffs", "consider maintainability").
+- Firing on word "advocate" outside the explicit `/advocate` command.
+- Turning into a bug hunt — that's `/impartial-review` / `/code-review`. `/advocate` assumes correctness, questions the *decision*.
+- Manufacturing objections to look thorough. Clean change → "keep."
+- Contrarian theater — only downsides, reflexive "revert." Counter-weight + calibrated verdict mandatory.
+- Feeding subagent whole conversation. Scope to diff + goal, nothing more.
+- Implementing the revision while running skill. Review, verdict, stop.
+- Generic caveats fitting any change ("weigh the tradeoffs", "consider maintainability").
