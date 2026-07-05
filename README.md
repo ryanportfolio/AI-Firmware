@@ -6,6 +6,20 @@ This template turns the config into a fleet: every new project starts from a tun
 
 Distilled from a production repo, with the project-specific content stripped out.
 
+## Highlights
+
+What sets this apart from a folder of dotfiles:
+
+- **Two-way sync, not copy-paste.** Most templates are a one-shot scaffold. Here, `/sync-starter` pushes generic wins from any project back to the template, and a weekly session-start nudge tells every project when the template has moved ahead. The config is a fleet, not a snapshot.
+- **Context cost is measured, not guessed.** `bash .claude/scripts/context-weight.sh` prints the exact per-turn token weight of everything always loaded, with a per-skill breakdown. `/optimize-context` is the playbook for cutting it. Almost no setups treat context as a budgeted resource — this one does.
+- **Memory that survives the session.** `/recall save` and `/learning` write gotchas into a committed reference library (`.claude/reference/`), so hard-won knowledge travels to every machine, sandbox, and teammate instead of dying with the conversation.
+- **Ultra-terse mode with guardrails.** The `caveman` skill cuts prose token usage ~75% while keeping full technical accuracy — with automatic clarity carve-outs for security warnings and irreversible actions.
+- **Multi-agent review on demand.** `/impartial-review` dispatches five parallel fresh-context reviewers (four bucket specialists plus one loaded with the project's own rules); `/handoff-audit` generates a self-contained prompt so a *separate* zero-context session can independently verify a change.
+- **Prototype before you commit.** `/lab` builds a throwaway HTML lab with live sliders so you tune a visual or feel element by hand, then ports the exact values into real code and deletes the lab.
+- **One-click spawn, one-command fork.** `bootstrap/New-ClaudeProject.cmd` creates, clones, and strips a new private repo in one double-click. `bash bootstrap/retarget-fork.sh <you>/<fork>` repoints every functional upstream reference to your fork and verifies nothing was missed.
+- **Hooks that do real work.** Session start auto-rebases in the cloud, primes git locally, re-asserts session defaults, and detects plugin/skill overlap — with the one-line fix printed for you.
+- **CI-gated config.** Every push parse-checks the executable surface: bootstrap scripts, hooks, and JSON manifests. Broken config never lands.
+
 ## Why this exists
 
 Claude Code works better with standing instructions, reusable skills, and accumulated project knowledge. But that value normally lives in a single repo and never propagates. claude-starter fixes the propagation problem in three ways:
