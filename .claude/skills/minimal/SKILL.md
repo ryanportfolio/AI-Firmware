@@ -1,6 +1,6 @@
 ---
 name: minimal
-description: Toggle minimal-skills mode — disable all project skills except a small keep-list (recall, pr, merge, handoff-audit, caveman, minimal) to cut per-turn context weight. Use when the user says /minimal, "minimal mode", "disable extra skills", or /minimal off, "restore skills", "re-enable skills".
+description: Toggle minimal-skills mode — disable all project skills except a small keep-list (recall, learning, pr, merge, handoff-audit, caveman, minimal) to cut per-turn context weight. Use when the user says /minimal, "minimal mode", "disable extra skills", or /minimal off, "restore skills", "re-enable skills".
 ---
 
 # Minimal skills mode
@@ -10,9 +10,10 @@ Turns every project skill except the keep-list off via `skillOverrides` in commi
 ## Keep-list
 
 ```
-recall  pr  merge  handoff-audit  caveman  minimal
+recall  learning  pr  merge  handoff-audit  caveman  minimal
 ```
 
+- `learning` stays because the self-improvement loop (capture gotchas into `.claude/reference/`) is core to the template, not an optional extra.
 - `caveman` stays because the kernel CLAUDE.md session-start default invokes it every session.
 - `minimal` stays so the mode can be toggled back off.
 

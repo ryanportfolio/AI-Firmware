@@ -19,7 +19,7 @@ What sets this apart from a folder of dotfiles:
 - **One-click spawn, one-command fork.** `bootstrap/New-ClaudeProject.cmd` creates, clones, and strips a new private repo in one double-click. `bash bootstrap/retarget-fork.sh <you>/<fork>` repoints every functional upstream reference to your fork and verifies nothing was missed.
 - **Hooks that do real work.** Session start auto-rebases in the cloud, primes git locally, re-asserts session defaults, and detects plugin/skill overlap — with the one-line fix printed for you.
 - **CI-gated config.** Every push parse-checks the executable surface: bootstrap scripts, hooks, and JSON manifests. Broken config never lands.
-- **Minimal mode.** `/minimal` turns off every skill except a six-skill core (`recall`, `pr`, `merge`, `handoff-audit`, `caveman`, `minimal`) via committed `skillOverrides`, shrinking the always-loaded skill list to its floor; `/minimal off` restores the full set. Also available as the `minimal` profile in `/init-project` for projects that want lean from day one.
+- **Minimal mode.** `/minimal` turns off every skill except a seven-skill core (`recall`, `learning`, `pr`, `merge`, `handoff-audit`, `caveman`, `minimal`) via committed `skillOverrides`, shrinking the always-loaded skill list to its floor; `/minimal off` restores the full set. Also available as the `minimal` profile in `/init-project` for projects that want lean from day one.
 
 ## Why this exists
 

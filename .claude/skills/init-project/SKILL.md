@@ -56,7 +56,7 @@ If the user doesn't know yet (brand-new project), write the honest default: "not
 | backend / CLI / library | `impeccable`, `lab` |
 | data / notebooks | `impeccable`, `lab` |
 | writing / docs | `impeccable`, `lab`, `test-driven-development`, `subagent-driven-development` |
-| minimal | every project skill EXCEPT the keep-list: `recall`, `pr`, `merge`, `handoff-audit`, `caveman`, `minimal` (see the `minimal` skill — `/minimal off` restores the full set later) |
+| minimal | every project skill EXCEPT the keep-list: `recall`, `learning`, `pr`, `merge`, `handoff-audit`, `caveman`, `minimal` (see the `minimal` skill — `/minimal off` restores the full set later) |
 
 The table is a floor, not a ceiling — offer obvious extras ("no frontend planned, also drop `humanizer`? it's for prose deliverables"). Each `off` saves its description from every turn (`bash .claude/scripts/context-weight.sh` shows per-skill weight); takes effect next session.
 
