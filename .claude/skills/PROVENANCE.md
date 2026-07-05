@@ -31,7 +31,7 @@ LICENSE/NOTICE files in the skill folder.
 
 `addskill`, `applying-best-practices`, `conflict`, `enhance-prompt`,
 `handoff-audit`, `impartial-review`, `init-project`, `lab`, `learning`,
-`merge`, `optimize-context`, `pr`, `recall`, `safe-ship`, `sync-starter`,
-`why`.
+`merge`, `minimal`, `optimize-context`, `pr`, `recall`, `safe-ship`,
+`sync-starter`, `why`.
 
 Homegrown skills are MIT, same as the repo (see the root `LICENSE`).

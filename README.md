@@ -31,7 +31,7 @@ Claude Code works better with standing instructions, reusable skills, and accumu
 ## What you get
 
 - A cross-cutting **rule kernel** (`CLAUDE.md`) loaded every turn: verification honesty, a git auto-commit/PR workflow, subagent discipline, and context-restraint principles.
-- **31 skills** covering the project lifecycle, everyday workflow, engineering discipline, and craft.
+- **32 skills** covering the project lifecycle, everyday workflow, engineering discipline, and craft.
 - A committed **memory library** (`.claude/reference/`) that accumulates project knowledge instead of losing it between sessions.
 - **Session hooks** that rebase in the cloud, prime git locally, re-assert session defaults, and warn about template drift and plugin overlap.
 - **CI** that parse-gates the executable surface (bootstrap scripts, hooks, JSON manifests) on every push.
@@ -60,7 +60,7 @@ This path reads the repo's marketplace manifest, so it works only once the repo 
 | Piece | What it does |
 |---|---|
 | `CLAUDE.md` | Kernel rules loaded every turn: verification honesty, git auto-commit/PR workflow, subagent discipline, context-restraint principles. Two `FILL IN` sections are configured per project by `/init-project`. |
-| `.claude/skills/` | 31 skills (enumerated below), each a self-contained Markdown playbook. |
+| `.claude/skills/` | 32 skills (enumerated below), each a self-contained Markdown playbook. |
 | `.claude/reference/` | Project memory: six topic files (`secrets`, `architecture`, `pitfalls`, `commands`, `tech-stack`, `deployment`) that `/recall` and `/learning` populate as you work. Committed, so they travel to every machine and sandbox. |
 | `.claude/hooks/session-start.sh` | Cloud: auto-rebase onto origin/main. Local: read-only fetch. Both: re-assert session defaults, run the weekly template-drift nudge, warn on plugin overlap. |
 | `.claude/scripts/context-weight.sh` | Prints the per-turn always-loaded context cost with a per-skill breakdown. |
@@ -70,9 +70,9 @@ This path reads the repo's marketplace manifest, so it works only once the repo 
 
 ## The skill set
 
-31 skills, grouped by role. See `.claude/skills/PROVENANCE.md` for each skill's origin, license, and local changes.
+32 skills, grouped by role. See `.claude/skills/PROVENANCE.md` for each skill's origin, license, and local changes.
 
-- **Lifecycle** (4): `init-project`, `sync-starter`, `addskill`, `optimize-context`.
+- **Lifecycle** (5): `init-project`, `sync-starter`, `addskill`, `optimize-context`, `minimal`.
 - **Workflow** (11): `recall`, `learning`, `safe-ship`, `pr`, `merge`, `caveman`, `enhance-prompt`, `handoff-audit`, `why`, `lab`, `conflict`.
 - **Discipline** (14): `brainstorming`, `writing-plans`, `executing-plans`, `systematic-debugging`, `test-driven-development`, `verification-before-completion`, `impartial-review`, `subagent-driven-development`, `dispatching-parallel-agents`, `using-git-worktrees`, `using-superpowers`, `writing-skills`, `applying-best-practices`, `finishing-a-development-branch`.
 - **Craft** (2): `impeccable`, `humanizer`.
