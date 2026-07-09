@@ -1,62 +1,42 @@
 # Codex Instructions
 
-This file is the Codex compatibility boundary for the Agent Firmware starter.
-Claude Code continues to use `CLAUDE.md`, `.claude/settings.json`, and the
-`.claude/` skill/hook system. Codex uses this file first, then reads the safe,
-project-specific parts of `CLAUDE.md`.
+This is the Codex boundary for the AI Operating System starter. Claude Code keeps using `CLAUDE.md` and `.claude/` unchanged.
 
-## Runtime Boundary
+## Defaults
 
-- Do not execute `.claude/hooks/session-start.sh` in Codex.
-- Read `CLAUDE.md` for project facts, verification requirements, architecture,
-  reference-library pointers, scope rules, and engineering standards.
-- Do not inherit Claude-only sections from `CLAUDE.md`: popup-tool rules,
-  SessionStart behavior, default `caveman` activation, Claude model names,
-  Claude skill invocation syntax, or automatic git integration.
-- Treat `.claude/skills/` as the canonical skill library. Codex-native adapters
-  under `.agents/skills/` expose those skills without duplicating them.
-- Claude-only tool names inside skills must be translated to Codex tools only
-  when a safe equivalent exists.
-- Treat `$ARGUMENTS` inside a canonical skill as the current invocation's
-  free-form input.
-- Claude popup-tool bans in `CLAUDE.md` are Claude-specific. In Codex, follow
-  the active Codex tool instructions for user input and planning.
+- Use Caveman Ultra for prose from the first reply, without asking or requiring `$caveman`. Keep code, commands, identifiers, errors, commits, PR text, and files normal.
+- Use plain prose for security warnings, irreversible confirmations, and ambiguous multi-step decisions, then resume Ultra. A new session restores Ultra after the user temporarily disables it.
+- Read `CLAUDE.md` for project facts, architecture, verification, references, and engineering rules. Do not inherit Claude popup rules, hook implementation, model names, slash syntax, or automatic Git behavior.
+- Never execute `.claude/hooks/session-start.sh` in Codex.
 
-## Codex Safety Rules
+## Capabilities
 
-- Do not activate persistent modes such as `caveman` or auto-merge unless the
-  user explicitly asks for that mode in the current Codex session.
-- Do not inherit Claude's auto-commit, auto-push, auto-PR, or auto-merge rules.
-  In Codex, ship only when the user asks for shipping or the current task
-  explicitly includes it.
-- Never push to `main`, force-push, merge, delete branches/worktrees, run
-  migrations, deploy, install runtime dependencies, or modify checkouts outside
-  the workspace without explicit current-session approval.
-- Stage explicit paths only. Never use blanket staging for mixed worktrees.
-- Keep private paths, secrets, tokens, and personal workflow mandates out of
-  starter defaults.
-- Verify before claiming completion. State exactly what ran; if the authoritative
-  check is CI, deploy logs, or the user's machine, say so.
+- Inspect tools exposed in the current session before using subagents, browser control, connectors, or interactive input. Config flags alone are not proof.
+- Serial fallback is valid only when independence is not part of the deliverable. `impartial-review`, `advocate`, and `why` require fresh independent context; if unavailable, report the gap.
+- Claude `Workflow` programs are not Codex programs. Recreate their intent with exposed Codex agents or flag them blocked.
+- Codex hooks may reinforce this file, but critical rules stay here because hooks depend on trust and feature availability.
+
+## RTK
+
+- When installed, prefer `rtk` for noisy supported reads: `rtk git status`, `rtk git diff`, `rtk git log`, `rtk git show`, `rtk rg`, and `rtk read`.
+- Use `rtk test <command>` for failure-focused output; preserve its exit code and rerun natively when full success output is required as evidence.
+- Use native commands for mutations, interactivity, unsupported syntax, exact-output parsing, and diagnosis when filtering hides detail.
+- Codex has no Claude RTK rewrite hook here. Invoke `rtk` explicitly.
+
+## Safety
+
+- Caveman Ultra is a communication default, not side-effect authorization. Auto-merge and other persistent side-effect modes require explicit current-session intent.
+- Do not inherit Claude auto-commit, push, PR, or merge. Ship only when the request includes shipping.
+- Never push to `main`, force-push, merge, delete branches/worktrees, migrate, deploy, install runtime dependencies, or modify external checkouts without explicit approval.
+- Stage explicit paths, preserve unrelated changes, and verify before claiming completion.
 
 ## Shared Assets
 
-- Project memory lives in `.claude/reference/`. Read the relevant file before
-  non-trivial work in an unfamiliar area.
-- Codex discovers repo skills from `.agents/skills/`. Each generated adapter
-  delegates to the matching canonical `.claude/skills/<name>/SKILL.md`.
-- After adding, removing, or editing a canonical skill, run
-  `node .claude/scripts/sync-codex-skills.mjs --write`.
-- Codex tool mapping notes live in
-  `.claude/skills/using-superpowers/references/codex-tools.md`.
-- Context budget can be inspected with `bash .claude/scripts/context-weight.sh`
-  when Bash is available.
+- `.claude/skills/` is canonical; `.agents/skills/` contains Codex adapters. Treat `$ARGUMENTS` as invocation input.
+- Read relevant `.claude/reference/` material before unfamiliar work and `.agents/CODEX-SKILL-COMPATIBILITY.md` before adapted, gated, or dangerous skills.
+- After canonical skill changes run `node .claude/scripts/sync-codex-skills.mjs --write`.
+- Tool mapping: `.claude/skills/using-superpowers/references/codex-tools.md`.
 
 ## Starter Maintenance
 
-- Bootstrap scripts under `bootstrap/` must stay ASCII-only for Windows
-  PowerShell 5.1 compatibility.
-- Shell scripts must keep LF line endings.
-- Keep runtime-specific claims precise: Claude Code gets hooks and slash skills;
-  Codex gets `AGENTS.md` plus native `.agents/skills` adapters.
-- If a template memory file contains maintainer-only local workflow rules,
-  remove or generalize them before shipping.
+Keep `bootstrap/` PowerShell 5.1 files ASCII-only and shell scripts LF. Claude gets its hooks and slash skills; Codex gets `AGENTS.md`, `.codex/`, and `.agents/skills/`. Keep private paths, tokens, and maintainer-only workflow out of defaults.
