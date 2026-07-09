@@ -1,18 +1,24 @@
 # Codex Instructions
 
 This file is the Codex compatibility boundary for the Agent Firmware starter.
-Claude Code should continue to use `CLAUDE.md`, `.claude/settings.json`, and the
-`.claude/` skill/hook system. Codex should use this file first.
+Claude Code continues to use `CLAUDE.md`, `.claude/settings.json`, and the
+`.claude/` skill/hook system. Codex uses this file first, then reads the safe,
+project-specific parts of `CLAUDE.md`.
 
 ## Runtime Boundary
 
 - Do not execute `.claude/hooks/session-start.sh` in Codex.
-- Do not treat `CLAUDE.md` as a Codex standing order when it conflicts with this
-  file or with Codex system/developer/tool instructions.
-- Treat `.claude/skills/` as a library of Markdown playbooks. They are useful
-  references, not native Codex slash commands.
+- Read `CLAUDE.md` for project facts, verification requirements, architecture,
+  reference-library pointers, scope rules, and engineering standards.
+- Do not inherit Claude-only sections from `CLAUDE.md`: popup-tool rules,
+  SessionStart behavior, default `caveman` activation, Claude model names,
+  Claude skill invocation syntax, or automatic git integration.
+- Treat `.claude/skills/` as the canonical skill library. Codex-native adapters
+  under `.agents/skills/` expose those skills without duplicating them.
 - Claude-only tool names inside skills must be translated to Codex tools only
   when a safe equivalent exists.
+- Treat `$ARGUMENTS` inside a canonical skill as the current invocation's
+  free-form input.
 - Claude popup-tool bans in `CLAUDE.md` are Claude-specific. In Codex, follow
   the active Codex tool instructions for user input and planning.
 
@@ -32,12 +38,14 @@ Claude Code should continue to use `CLAUDE.md`, `.claude/settings.json`, and the
 - Verify before claiming completion. State exactly what ran; if the authoritative
   check is CI, deploy logs, or the user's machine, say so.
 
-## Useful Claude Assets For Codex
+## Shared Assets
 
 - Project memory lives in `.claude/reference/`. Read the relevant file before
   non-trivial work in an unfamiliar area.
-- Reusable workflows live in `.claude/skills/<name>/SKILL.md`. Read the specific
-  skill only when the task matches it.
+- Codex discovers repo skills from `.agents/skills/`. Each generated adapter
+  delegates to the matching canonical `.claude/skills/<name>/SKILL.md`.
+- After adding, removing, or editing a canonical skill, run
+  `node .claude/scripts/sync-codex-skills.mjs --write`.
 - Codex tool mapping notes live in
   `.claude/skills/using-superpowers/references/codex-tools.md`.
 - Context budget can be inspected with `bash .claude/scripts/context-weight.sh`
@@ -49,6 +57,6 @@ Claude Code should continue to use `CLAUDE.md`, `.claude/settings.json`, and the
   PowerShell 5.1 compatibility.
 - Shell scripts must keep LF line endings.
 - Keep runtime-specific claims precise: Claude Code gets hooks and slash skills;
-  Codex gets `AGENTS.md` plus manual use of the skill/reference library.
+  Codex gets `AGENTS.md` plus native `.agents/skills` adapters.
 - If a template memory file contains maintainer-only local workflow rules,
   remove or generalize them before shipping.

@@ -69,6 +69,13 @@ The table is a floor, not a ceiling — offer obvious extras ("no frontend plann
 
 If `README.md` is the spawn stub (`# <name>` only), ask the user for a one-line project description and expand it minimally: name, one-liner, how to run (from `commands.md`). Don't write aspirational docs for code that doesn't exist.
 
+## Step 6b: Sync Codex skill adapters
+
+Run `node .claude/scripts/sync-codex-skills.mjs --write` after applying the
+profile. The generator mirrors active skill metadata into thin
+`.agents/skills/` adapters while leaving the canonical Claude skills unchanged.
+Disabled skills are omitted according to `skillOverrides`.
+
 ## Step 7: Wire the starter remote
 
 ```
@@ -87,4 +94,6 @@ Follow the project's git rule: branch (`feat/init-project`), stage exactly the f
 - Don't run installs just to probe the stack — read manifests instead.
 - Don't leave any `FILL IN` marker behind. `grep -n "FILL IN" CLAUDE.md` must return nothing at the end.
 - Don't pad the reference files with boilerplate prose — they're lookup tables for future sessions, not documentation theater.
+- Don't copy full skills into `.agents/skills/` — generated adapters keep
+  `.claude/skills/` as the single source of truth for both runtimes.
 - Don't run this twice. Configured projects evolve via `/recall save` and direct CLAUDE.md edits, not re-initialization.

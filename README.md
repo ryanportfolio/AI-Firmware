@@ -39,11 +39,11 @@ This repository now separates runtime-specific behavior:
 | Runtime | Entry point | Behavior |
 |---|---|---|
 | Claude Code | `CLAUDE.md`, `.claude/settings.json`, `.claude/hooks/`, `.claude/skills/` | Full firmware: project memory, slash skills, session hook, plugin path, and Claude-specific workflow rules. |
-| Codex | `AGENTS.md` | Safe compatibility layer: Codex can use the repo knowledge and skill playbooks without inheriting Claude-only hooks, popup assumptions, or auto-merge behavior. |
+| Codex | `AGENTS.md`, `.agents/skills/` | Safe compatibility layer plus native skill discovery, backed by the unchanged canonical Claude workflows. |
 
-Codex users should treat `.claude/skills/` as a library of Markdown playbooks.
-Codex does not get Claude slash commands or SessionStart hooks from this repo.
-`AGENTS.md` defines the safety boundary and tool translation rules.
+Codex discovers thin adapters under `.agents/skills/`. Each adapter delegates to
+the matching canonical `.claude/skills/` workflow, so both runtimes use one
+source of truth. Codex does not run Claude SessionStart hooks.
 
 ## Highlights
 
@@ -86,15 +86,14 @@ Use this when opening a spawned project or the starter itself in Codex.
 
 1. Open the repo in Codex.
 2. Let Codex read `AGENTS.md` as the authoritative Codex instruction boundary.
-3. Use `.claude/reference/` for project memory.
-4. Use `.claude/skills/<skill>/SKILL.md` as reference playbooks when relevant.
+3. Use `.claude/reference/` for shared project memory.
+4. Let Codex discover the generated repo skills under `.agents/skills/`.
 5. Do not run Claude hooks or inherit Claude auto-commit/auto-merge rules unless
    the user explicitly asks in the current Codex session.
 
-For a fresh Codex-only project, manually follow the intent of
-`.claude/skills/init-project/SKILL.md`: detect the stack, write verification and
-deployment facts into project instructions, seed reference files, and remove
-template-only artifacts that are not relevant.
+For a fresh project, ask Codex to initialize the starter or select the
+`init-project` skill. Its adapter delegates to the same canonical workflow
+Claude Code uses.
 
 ### C. Claude Plugin Skills Only
 
@@ -115,8 +114,9 @@ skills un-namespaced and do not need the plugin.
 | Piece | What it does |
 |---|---|
 | `CLAUDE.md` | Claude Code kernel rules loaded every turn. Two placeholder sections are configured per project by `/init-project`. |
-| `AGENTS.md` | Codex compatibility boundary. Prevents Claude-only rules from becoming unsafe Codex standing orders. |
-| `.claude/skills/` | 31 Markdown playbooks covering lifecycle, workflow, engineering discipline, and craft. |
+| `AGENTS.md` | Codex compatibility boundary. Inherits project facts while excluding Claude-only runtime behavior. |
+| `.claude/skills/` | 32 canonical Markdown playbooks used by Claude Code and Codex. |
+| `.agents/skills/` | Generated Codex-native adapters; metadata only, no duplicated workflow bodies. |
 | `.claude/reference/` | Durable project memory: secrets, architecture, pitfalls, commands, tech stack, and deployment notes. |
 | `.claude/hooks/session-start.sh` | Claude Code SessionStart hook for drift checks, overlap warnings, and Claude-specific session defaults. |
 | `.claude/scripts/context-weight.sh` | Measures always-loaded context weight. |
@@ -132,7 +132,7 @@ changes.
 - **Lifecycle:** `init-project`, `sync-starter`, `addskill`,
   `optimize-context`.
 - **Workflow:** `recall`, `learning`, `safe-ship`, `pr`, `merge`, `caveman`,
-  `enhance-prompt`, `handoff-audit`, `why`, `lab`, `conflict`.
+  `enhance-prompt`, `handoff-audit`, `why`, `advocate`, `lab`, `conflict`.
 - **Discipline:** `brainstorming`, `writing-plans`, `executing-plans`,
   `systematic-debugging`, `test-driven-development`,
   `verification-before-completion`, `impartial-review`,
@@ -181,8 +181,8 @@ The script copies missing files only; `-Force` overwrites; `-DryRun` previews.
 ## Requirements
 
 - Claude Code for the full template and plugin workflow.
-- Codex can safely use the repo through `AGENTS.md`, but it does not execute
-  Claude slash skills or hooks natively.
+- Codex uses `AGENTS.md` and native `.agents/skills/` adapters. It does not run
+  Claude SessionStart hooks.
 - `gh` CLI is optional for the Windows project creator. Without it, the script
   falls back to a local copy plus printed manual GitHub steps.
 - Bootstrap is Windows-first PowerShell. The Claude session hook is Bash and is
