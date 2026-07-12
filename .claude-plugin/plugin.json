@@ -1,11 +1,11 @@
 {
   "name": "claude-starter",
-  "displayName": "Claude Starter Skills",
+  "displayName": "Agent Firmware Skills",
   "version": "1.1.1",
-  "description": "The claude-starter skill set without cloning the template: workflow (recall, caveman, safe-ship, pr, merge), discipline (systematic-debugging, TDD, verification-before-completion, impartial-review, brainstorming, plans), and craft tooling (repository-specific UI skill synthesis, humanizer).",
+  "description": "The Agent Firmware skill set for Claude Code without cloning the full template: durable memory, context controls, safe shipping, debugging, TDD, review, planning, frontend craft, and terse-mode workflows.",
   "author": { "name": "ryanportfolio", "url": "https://github.com/ryanportfolio" },
   "repository": "https://github.com/ryanportfolio/claude-starter",
   "homepage": "https://github.com/ryanportfolio/claude-starter",
-  "keywords": ["starter", "workflow", "skills", "template", "tdd", "debugging", "frontend"],
+  "keywords": ["agent-firmware", "starter", "workflow", "skills", "template", "tdd", "debugging", "frontend"],
   "skills": "./.claude/skills/"
 }

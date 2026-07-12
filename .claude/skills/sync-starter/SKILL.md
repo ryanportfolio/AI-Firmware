@@ -20,7 +20,7 @@ git fetch starter
 Only these paths are sync candidates:
 
 ```
-git diff --stat HEAD starter/main -- .claude/skills .claude/hooks .claude/settings.json
+git diff --stat HEAD starter/main -- AGENTS.md .claude/skills .claude/hooks .claude/scripts .claude/settings.json
 ```
 
 **Diverged-by-design — NEVER bulk-pull these:**
@@ -39,6 +39,10 @@ git checkout starter/main -- .claude/skills/<picked>/ .claude/hooks/<picked>
 ```
 
 For `settings.json`: merge, don't overwrite — the project may have its own permission additions. Read both, union the `allow` lists, keep project-specific hooks.
+
+After any skill or `skillOverrides` change, run
+`node .claude/scripts/sync-codex-skills.mjs --write`. Stage the generated
+`.agents/skills/` changes with the canonical skill changes.
 
 ### Step 5: Ship
 
@@ -62,4 +66,6 @@ When a skill fix / new skill / hook improvement made in THIS project is generic 
 - Don't overwrite `settings.json` — union the permission lists.
 - Don't push project-flavored content back to the template — genericize or leave it.
 - Don't treat a CLAUDE.md diff as pullable — kernel changes are always a hand-merge.
+- Don't hand-edit generated `.agents/skills/` adapters — update the canonical
+  Claude skill and regenerate.
 - Don't sync on every session. This is occasional maintenance, user-triggered.

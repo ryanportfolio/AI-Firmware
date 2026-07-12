@@ -63,7 +63,18 @@ Rules of thumb:
 - **Don't reference platform-specific tools** in the body (e.g. "use the Bash tool"). Say "run this command" instead. Skills should work across CLI and web.
 - **`$ARGUMENTS`** is available inside the skill body — that's how the user passes input via `/skillname some text`.
 
-## Step 4: Verify the skill is wired up
+## Step 4: Generate the Codex adapter
+
+Run:
+
+```bash
+node .claude/scripts/sync-codex-skills.mjs --write
+```
+
+This creates `.agents/skills/<name>/SKILL.md`, a thin Codex-native adapter that
+delegates to the unchanged canonical Claude skill.
+
+## Step 5: Verify the skill is wired up
 
 After writing, sanity-check:
 
@@ -71,6 +82,7 @@ After writing, sanity-check:
 - Frontmatter parses (single `---` block at the very top, valid YAML)
 - `description` field is present and non-empty
 - Skill name folder matches the slash command the user expects
+- Generated adapter exists at `.agents/skills/<name>/SKILL.md`
 
 You can grep existing skills for shape comparison:
 ```
@@ -78,12 +90,12 @@ ls .claude/skills/
 head -5 .claude/skills/pr/SKILL.md
 ```
 
-## Step 5: Commit and push
+## Step 6: Commit and push
 
 Skills only become visible in **future** web sessions after they're committed and pushed. On the current branch:
 
 ```
-git add .claude/skills/<skill-name>/SKILL.md
+git add .claude/skills/<skill-name>/SKILL.md .agents/skills/<skill-name>/SKILL.md
 git commit -m "Add /<skill-name> skill"
 git push -u origin <current-branch>
 ```
@@ -100,6 +112,7 @@ Tell the user the skill will appear in the **next** session — the available-sk
 - Don't put skills in `~/.claude/skills/` — they won't follow to the web sandbox.
 - Don't put skills in the repo root or a random subfolder — only `.claude/skills/<name>/SKILL.md` is loaded.
 - Don't fabricate the contents of a third-party skill (`superpowers`, etc.) you don't have the source for. Ask the user for the source.
+- Don't skip adapter generation — Codex discovers repo skills from `.agents/skills/`.
 - Don't skip the commit/push step. Uncommitted skills won't survive the next session.
 - Don't use `git add -A` or `git add .` — stage only the new skill file(s).
 - Don't claim the skill is "now available" in the current session — it isn't until the session reloads.

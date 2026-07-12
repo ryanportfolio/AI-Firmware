@@ -1,4 +1,4 @@
-# new-claude-project.ps1 - spin up a new project from the claude-starter template.
+# new-claude-project.ps1 - spin up a new project from the Agent Firmware template.
 #
 # What it does:
 #   1. Prompts for a project name (or takes it as -Name).
@@ -13,7 +13,7 @@
 
 param(
     [string]$Name,
-    [string]$Dest = "$HOME\CoreWise",
+    [string]$Dest = "$HOME\code",
     [string]$Template = "ryanportfolio/claude-starter"
 )
 
@@ -72,7 +72,8 @@ if ($ghOk) {
         Write-Host "  Local:  $target"
         Write-Host "  Remote: https://github.com/$((gh api user --jq .login))/$Name"
         Write-Host ""
-        Write-Host "Next: open the folder in Claude Code and run /init-project (guided setup)."
+        Write-Host "Next: open the folder in Claude Code and run /init-project."
+        Write-Host "Codex users: open the folder in Codex; AGENTS.md provides the safety boundary."
         exit 0
     }
 }
@@ -102,4 +103,5 @@ Write-Host "       cd `"$target`""
 Write-Host "       git remote add origin https://github.com/<your-username>/$Name.git"
 Write-Host "       git push -u origin main"
 Write-Host ""
-Write-Host "Next: open the folder in Claude Code and run /init-project (guided setup)."
+Write-Host "Next: open the folder in Claude Code and run /init-project."
+Write-Host "Codex users: open the folder in Codex; AGENTS.md provides the safety boundary."
