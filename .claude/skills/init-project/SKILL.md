@@ -53,9 +53,9 @@ If the user doesn't know yet (brand-new project), write the honest default: "not
 | Profile | Disable (`"off"`) |
 |---|---|
 | web-app | — (full set) |
-| backend / CLI / library | `impeccable`, `lab` |
-| data / notebooks | `impeccable`, `lab` |
-| writing / docs | `impeccable`, `lab`, `test-driven-development`, `subagent-driven-development` |
+| backend / CLI / library | `forge-repo-ui-skill`, `lab` |
+| data / notebooks | `forge-repo-ui-skill`, `lab` |
+| writing / docs | `forge-repo-ui-skill`, `lab`, `test-driven-development`, `subagent-driven-development` |
 
 The table is a floor, not a ceiling — offer obvious extras ("no frontend planned, also drop `humanizer`? it's for prose deliverables"). Each `off` saves its description from every turn (`bash .claude/scripts/context-weight.sh` shows per-skill weight); takes effect next session.
 

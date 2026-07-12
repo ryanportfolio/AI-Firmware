@@ -1,5 +1,5 @@
 ---
-description: Add a new skill to this repo so it's available in every Claude Code web session. Use when the user says /addskill, asks to "add a skill", "install a skill", "create a skill", or wants a third-party skill (e.g. superpowers, impeccable) to show up in the available-skills list. Skills must live in the project's .claude/skills/ folder and be committed — personal/global installs do NOT follow the user into the web sandbox.
+description: Add a new skill to this repo so it's available in every Claude Code web session. Use when the user says /addskill, asks to "add a skill", "install a skill", "create a skill", or wants a third-party skill (e.g. superpowers) to show up in the available-skills list. Skills must live in the project's .claude/skills/ folder and be committed — personal/global installs do NOT follow the user into the web sandbox.
 ---
 
 # Add skill — install a skill into this repo
@@ -12,7 +12,7 @@ Ask the user (or infer from `$ARGUMENTS`) where the skill content comes from:
 
 - **A name + description** the user wants you to author from scratch
 - **An existing local folder** (e.g. `~/.claude/skills/<name>/`) to copy in
-- **A third-party skill** (e.g. `superpowers`, `impeccable`) — these usually ship via a Claude Code plugin marketplace. Ask the user for the source URL/repo. Do NOT invent contents.
+- **A third-party skill** (e.g. `superpowers`) — these usually ship via a Claude Code plugin marketplace. Ask the user for the source URL/repo. Do NOT invent contents.
 
 If the source is ambiguous or the user only gave a name you don't recognize, ask once before authoring.
 

@@ -72,10 +72,10 @@ This path reads the repo's marketplace manifest, so it works only once the repo 
 
 31 skills, grouped by role. See `.claude/skills/PROVENANCE.md` for each skill's origin, license, and local changes.
 
-- **Lifecycle** (4): `init-project`, `sync-starter`, `addskill`, `optimize-context`.
+- **Lifecycle** (5): `init-project`, `sync-starter`, `addskill`, `optimize-context`, `forge-repo-ui-skill`.
 - **Workflow** (11): `recall`, `learning`, `safe-ship`, `pr`, `merge`, `caveman`, `enhance-prompt`, `handoff-audit`, `why`, `lab`, `conflict`.
 - **Discipline** (14): `brainstorming`, `writing-plans`, `executing-plans`, `systematic-debugging`, `test-driven-development`, `verification-before-completion`, `impartial-review`, `subagent-driven-development`, `dispatching-parallel-agents`, `using-git-worktrees`, `using-superpowers`, `writing-skills`, `applying-best-practices`, `finishing-a-development-branch`.
-- **Craft** (2): `impeccable`, `humanizer`.
+- **Craft** (1): `humanizer`.
 
 ## After spawning a project
 
@@ -117,4 +117,4 @@ Review the diff and commit. LICENSE attribution is left untouched, and the scrip
 
 ## Provenance & license
 
-MIT (see `LICENSE`). Several skills are forked from upstream work, notably Jesse Vincent's [superpowers](https://github.com/obra/superpowers) (MIT) and Paul Bakaus's impeccable (Apache 2.0, itself based on Anthropic's [frontend-design](https://github.com/anthropics/skills/tree/main/skills/frontend-design) skill). `.claude/skills/PROVENANCE.md` tracks every skill's origin, license, and local deltas; per-skill LICENSE/NOTICE files ship in the skill folders.
+MIT (see `LICENSE`). Several skills are forked from upstream work, notably Jesse Vincent's [superpowers](https://github.com/obra/superpowers) (MIT). `.claude/skills/PROVENANCE.md` tracks every skill's origin, license, and local deltas; per-skill LICENSE/NOTICE files ship in third-party skill folders when required.
