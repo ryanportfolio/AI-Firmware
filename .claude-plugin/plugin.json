@@ -1,7 +1,7 @@
 {
   "name": "claude-starter",
   "displayName": "Claude Starter Skills",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "The claude-starter skill set without cloning the template: workflow (recall, caveman, safe-ship, pr, merge), discipline (systematic-debugging, TDD, verification-before-completion, impartial-review, brainstorming, plans), and craft tooling (repository-specific UI skill synthesis, humanizer).",
   "author": { "name": "ryanportfolio", "url": "https://github.com/ryanportfolio" },
   "repository": "https://github.com/ryanportfolio/claude-starter",
