@@ -1,7 +1,7 @@
 ---
 name: purposeful-writing
 description: "Use when drafting or revising prose for a reader: application answers, emails, essays, bios, cover letters, proposals, memos, reports, product copy, speeches, or when a draft reads as machine-made or must match a writer's own voice."
-version: 1.2.0
+version: 1.2.1
 author: Hermes Agent
 license: MIT
 metadata:
@@ -75,7 +75,16 @@ Concrete nouns, strong verbs, short words, active voice. Say "I led the project,
 
 ### Cut AI tells
 
-Scan for machine-made markers and rewrite: inflated vocabulary (delve, leverage, robust, seamless, tapestry), copula dodges ("serves as" becomes "is"), fake structure (rule-of-three lists, "not just X, it's Y"), filler openers and closers, vague attribution like "experts say" (name the source or cut the claim), and feeling-over-mechanism phrasing (say what it does, returns, or costs).
+Certain words and shapes mark writing as machine-made. Scan for them, then cut or rewrite:
+
+- **Inflated vocabulary:** delve, crucial, pivotal, testament, showcase, foster, leverage, utilize, robust, seamless, vibrant, tapestry, underscore, landscape (abstract). Use the plain word.
+- **Copula dodges:** "serves as," "stands as," "boasts." Say "is" or "has."
+- **Fake structure:** rule-of-three lists ("innovation, inspiration, and insight"), "not just X, it's Y," and "from X to Y" ranges where X and Y are not a real scale.
+- **Filler openers and closers:** "Great question," "Let's dive in," "It's important to note," "I hope this helps," "In today's world."
+- **Formula sections:** "Despite these challenges, X continues to thrive," "The future looks bright."
+- **Style tics:** em dashes, colons used as mid-sentence connectors, boldface on every noun, inline-header bullets that restate their own label, Title Case headings, decorative emojis.
+- **Vague attribution:** "experts say," "studies show," "it is widely regarded." Name the source or cut the claim.
+- **Feeling over mechanism:** "stays close at hand," "unlocks seamless experiences." Say what it does, returns, or costs.
 
 The full catalog with before/after examples lives in the `humanizer` skill's `patterns.md`. Read it when a tell is ambiguous. Do not trade one tell for another: swapping em dashes for semicolon piles is the same problem in new clothes.
 
