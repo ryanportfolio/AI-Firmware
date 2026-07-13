@@ -14,7 +14,7 @@ Invoking `/merge` IS the user's standing authorization to merge into `main` repe
 
 On `/merge`, announce activation in **plain prose** (not caveman), so the user can immediately correct a misread of this standing authorization. Say, concisely:
 
-> **Auto-Merge Mode is ON for this session.** From now on, when a task is complete I will, without asking: commit the touched files, push, ensure a PR exists, merge it into `main` (resolving conflicts where unambiguous), and fast-forward your local `main` checkout so the change is on disk. The session branch is kept the whole session. Say "stop merge" to turn this off.
+> **Auto-Merge Mode is ON for this session.** From now on, when a task is complete I will, without asking: commit the touched files, push, ensure a PR exists, and merge it into `main` (resolving conflicts where unambiguous). The session branch is kept the whole session. Say "stop merge" to turn this off.
 
 Then continue the current work. The cycle fires on the **next** task completion (and every one after), not retroactively.
 
@@ -56,17 +56,8 @@ gh pr merge <number> --merge
 - **No `--squash` / `--rebase`** unless the user explicitly asked.
 - **No `--admin`** — do not bypass branch protection or failing required checks. If the merge is blocked by checks/protection, report why and stop (pause the cycle for that task); do not force it.
 
-### 7. Update the local main checkout
-`gh pr merge` advances the **remote**. The working tree the user runs day-to-day still holds the pre-merge files until its local `main` is fast-forwarded. When this session runs in a git worktree, that day-to-day tree is a **separate folder** and is the thing most often forgotten — the PR merges green but the files the user actually loads never change.
-
-- Find the primary checkout: `git worktree list` — the **first** entry is the main working tree (linked worktrees follow). If this session is not in a worktree, that entry is the current repo root.
-- Advance it **only when it is safe** — on `main` (or the repo default branch) and clean. Check with `git -C <path> rev-parse --abbrev-ref HEAD` and `git -C <path> status --porcelain`.
-  - Safe → fast-forward it: `git -C <path> merge --ff-only origin/main`. Refs are shared across worktrees, so `origin/main` is already current from step 4's fetch (re-fetch if unsure). Never rebase, never a local merge commit, never `--force`.
-  - **Auto-clarity carve-out:** if that tree is dirty or on a different branch, do **not** touch it. Report the exact `cd <path> && git pull` (or `git checkout main && git pull`) for the user to run. Silently updating a dirty or divergent tree risks clobbering their work.
-- The session's own worktree already has the merged content (it was the source), so it needs nothing here.
-
-### 8. Report
-Confirm the merge landed, give the PR URL, note the branch was kept, and say whether the local `main` checkout was fast-forwarded or still needs a manual `git pull`. If anything blocked it (failing checks, protection, unresolved/ambiguous conflict, an unsafe local tree), report the exact `gh`/`git` output and the reason — never claim success you did not verify.
+### 7. Report
+Confirm the merge landed, give the PR URL, note the branch was kept. If anything blocked it (failing checks, protection, unresolved/ambiguous conflict), report the exact `gh`/`git` output and the reason — never claim success you did not verify.
 
 ## Why no per-merge confirm
 
@@ -91,5 +82,3 @@ Turn the mode OFF when the user says "stop merge", "stop auto-merge", "normal mo
 - Don't bypass protections/checks (`--admin`) without an explicit ask — report the block and stop.
 - Don't guess on semantic merge conflicts — resolve the unambiguous ones, stop and ask on the rest.
 - Don't fabricate success — report the real `gh pr merge` / `git merge` outcome.
-- Don't stop at the remote merge — fast-forward the primary `main` checkout so the change is on disk, or report the manual `git pull` when the tree is dirty or on another branch.
-- Don't force-update a divergent or dirty local checkout — fast-forward only, on a clean `main`, else hand the `git pull` back to the user.
