@@ -90,22 +90,21 @@ ls .claude/skills/
 head -5 .claude/skills/pr/SKILL.md
 ```
 
-## Step 6: Commit and push
+## Step 6: Commit and land on main
 
-Skills only become visible in **future** web sessions after they're committed and pushed. On the current branch:
+Skills only become visible in **future** sessions once they're committed **and merged into `main`** — both web sandboxes and the local CLI read from `main`, not from a feature branch. Committing to the branch alone is not enough.
+
+Stage only the new skill file(s) — never `git add -A`:
 
 ```
 git add .claude/skills/<skill-name>/SKILL.md .agents/skills/<skill-name>/SKILL.md
-git commit -m "Add /<skill-name> skill"
-git push -u origin <current-branch>
 ```
 
-Then provide the PR comparison URL per repo policy (derive the repo path from `git remote get-url origin`):
-```
-https://github.com/<owner>/<repo>/compare/<current-branch>
-```
+Then invoke the `/merge` skill to commit, push, open the PR, and merge to `main` (with conflict handling and the local main-checkout pull). `/merge` owns the land-on-main logic — don't duplicate it here.
 
-Tell the user the skill will appear in the **next** session — the available-skills list is loaded at session start, so the current session won't see it until reload.
+If the user prefers a one-shot land instead of session-wide auto-merge, do the equivalent manually: commit, push, `gh pr merge`, then `git pull` in the local `main` checkout so the file the user actually runs is updated.
+
+Tell the user the skill appears in the **next** session — the available-skills list loads at session start, so the current session won't see it until reload.
 
 ## Anti-patterns
 
@@ -113,6 +112,6 @@ Tell the user the skill will appear in the **next** session — the available-sk
 - Don't put skills in the repo root or a random subfolder — only `.claude/skills/<name>/SKILL.md` is loaded.
 - Don't fabricate the contents of a third-party skill (`superpowers`, etc.) you don't have the source for. Ask the user for the source.
 - Don't skip adapter generation — Codex discovers repo skills from `.agents/skills/`.
-- Don't skip the commit/push step. Uncommitted skills won't survive the next session.
+- Don't stop at pushing the branch. An unmerged branch skill is invisible — sessions read from `main`. Land it via `/merge`.
 - Don't use `git add -A` or `git add .` — stage only the new skill file(s).
 - Don't claim the skill is "now available" in the current session — it isn't until the session reloads.
