@@ -60,6 +60,11 @@ starter sync.
 - GitHub UI: **Use this template -> Create a new repository**, clone it, open it
   in Claude Code, then run `/init-project`.
 - Windows one-click: double-click `bootstrap/New-ClaudeProject.cmd`.
+- Windows visual launcher: download and extract
+  [`New-ClaudeProject-UI.zip`](https://github.com/ryanportfolio/claude-starter/releases/latest/download/New-ClaudeProject-UI.zip),
+  then double-click `New-ClaudeProject-UI.cmd`. Keep the extracted launcher,
+  PowerShell module, and `template/` folder together; the bundled snapshot makes
+  local-only creation work without GitHub access.
 - Windows CLI: `.\bootstrap\new-claude-project.ps1 -Name my-app -Dest C:\code`
 
 `/init-project` detects the stack, asks a short Q&A, fills the verification and

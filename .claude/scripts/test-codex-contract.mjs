@@ -15,6 +15,10 @@ function read(relativePath) {
   return fs.readFileSync(path.join(root, relativePath), "utf8");
 }
 
+function exists(relativePath) {
+  return fs.existsSync(path.join(root, relativePath));
+}
+
 function frontmatter(relativePath) {
   const text = read(relativePath);
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
@@ -117,9 +121,46 @@ for (const target of [".claude-plugin/", "bootstrap/", ".github/workflows/valida
   if (!initProject.includes(target)) failures.push(`init-project: cleanup contract omits ${target}`);
 }
 
-const bootstrap = read("bootstrap/new-claude-project.ps1");
-for (const target of [".claude-plugin", ".github\\workflows\\validate-template.yml"]) {
-  if (!bootstrap.includes(target)) failures.push(`new-claude-project.ps1: cleanup contract omits ${target}`);
+const corePath = "bootstrap/NewProjectCore.psm1";
+if (!exists(corePath)) {
+  failures.push(`${corePath}: shared project generator is missing`);
+} else {
+  const core = read(corePath);
+  for (const target of ["bootstrap", ".claude-plugin", ".github\\workflows\\validate-template.yml"]) {
+    if (!core.includes(target)) failures.push(`${corePath}: cleanup contract omits ${target}`);
+  }
+  for (const command of ["Test-NewProjectName", "Get-NewProjectMode", "Invoke-NewProject"]) {
+    if (!core.includes(command)) failures.push(`${corePath}: does not expose ${command}`);
+  }
+  if (!core.includes("'archive'")) failures.push(`${corePath}: local repo copies must use a tracked Git archive`);
+}
+
+for (const wrapper of ["bootstrap/new-claude-project.ps1", "bootstrap/new-claude-project-ui.ps1"]) {
+  const text = read(wrapper);
+  if (!text.includes("NewProjectCore.psm1")) failures.push(`${wrapper}: does not load the shared project generator`);
+  for (const duplicatedCommand of ["gh repo create", "robocopy"]) {
+    if (text.includes(duplicatedCommand)) failures.push(`${wrapper}: duplicates core command ${duplicatedCommand}`);
+  }
+}
+
+const releaseBuilderPath = "bootstrap/Build-NewClaudeProjectUIRelease.ps1";
+if (!exists(releaseBuilderPath)) {
+  failures.push(`${releaseBuilderPath}: reproducible UI release builder is missing`);
+} else {
+  const releaseBuilder = read(releaseBuilderPath);
+  for (const asset of ["New-ClaudeProject-UI.cmd", "new-claude-project-ui.ps1", "NewProjectCore.psm1", "template"]) {
+    if (!releaseBuilder.includes(asset)) failures.push(`${releaseBuilderPath}: release manifest omits ${asset}`);
+  }
+  if (!releaseBuilder.includes("archive")) failures.push(`${releaseBuilderPath}: template snapshot is not sourced from tracked Git files`);
+}
+
+const generatorSmokePath = "bootstrap/tests/Test-NewProjectGenerator.ps1";
+if (!exists(generatorSmokePath)) {
+  failures.push(`${generatorSmokePath}: local generator smoke test is missing`);
+} else {
+  const workflow = read(".github/workflows/validate-template.yml");
+  if (!workflow.includes("windows-latest")) failures.push("validate-template.yml: generator smoke test needs a Windows runner");
+  if (!workflow.includes("Test-NewProjectGenerator.ps1")) failures.push("validate-template.yml: generator smoke test is not wired into CI");
 }
 
 if (failures.length) {

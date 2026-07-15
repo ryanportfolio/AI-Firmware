@@ -1,17 +1,17 @@
 # new-claude-project-ui.ps1 - visual, double-clickable front end for
-# new-claude-project.ps1. Spins up a new project from the claude-starter
-# template, mirroring the console script's behaviour exactly:
+# new-claude-project.ps1. Both front ends call NewProjectCore.psm1 so project
+# creation and cleanup cannot drift:
 #
 #   * gh mode  : create a PRIVATE GitHub repo from the template, clone it,
 #                strip template-only files, drop a README stub, commit, push.
-#   * fallback : robocopy the template locally, git init, first commit, then
-#                print the manual GitHub steps.
+#   * fallback : copy the bundled template locally, initialize Git, then print
+#                the manual GitHub steps.
 #
 # Runtime: Windows PowerShell 5.1, WPF, STA. Launch it through
 # New-ClaudeProject-UI.cmd (which supplies the mandatory -STA flag), or:
 #   powershell -NoProfile -ExecutionPolicy Bypass -STA -File .\new-claude-project-ui.ps1
 #
-# Threading: gh / git / robocopy are slow, so they run on a background
+# Threading: repository and file operations are slow, so they run on a background
 # runspace. That worker NEVER touches WPF - it only enqueues plain message
 # hashtables onto a synchronized queue. A UI-thread DispatcherTimer is the
 # sole consumer: it drains the queue and applies every change to WPF elements,
@@ -27,6 +27,8 @@ $script:ScriptDir = $PSScriptRoot
 if ([string]::IsNullOrWhiteSpace($script:ScriptDir)) {
     $script:ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 }
+$script:CoreModulePath = Join-Path $script:ScriptDir 'NewProjectCore.psm1'
+Import-Module -Force -Name $script:CoreModulePath
 
 $DefaultDest = Join-Path $HOME 'code'
 $DefaultTmpl = 'ryanportfolio/claude-starter'
@@ -48,172 +50,73 @@ $script:createdRepo = $null
 #  WPF; they only enqueue message hashtables for the UI-thread drain to apply.
 # =============================================================================
 
-# Detects whether gh mode is available and reports the reason.
+# Detects whether GitHub mode is available and reports the reason.
 $DetectBody = {
-    param($sync)
-    $mode   = 'local'
-    $reason = 'gh CLI not found. The template is copied locally and the manual GitHub steps are shown.'
-    $gh = Get-Command gh -ErrorAction SilentlyContinue
-    if ($gh) {
-        cmd /c "gh auth status >nul 2>&1"
-        if ($LASTEXITCODE -eq 0) {
-            $mode   = 'gh'
-            $reason = 'gh CLI detected and authenticated. A private GitHub repo is created from the template, cloned, and pushed.'
-        } else {
-            $reason = 'gh CLI found but not signed in. The template is copied locally and the manual GitHub steps are shown.'
-        }
+    param($sync, $ModulePath)
+
+    try {
+        Import-Module -Force -Name $ModulePath
+        $mode = Get-NewProjectMode
+        $sync.Queue.Enqueue(@{ kind = 'mode'; mode = $mode.Mode; reason = $mode.Reason })
     }
-    $sync.Queue.Enqueue(@{ kind = 'mode'; mode = $mode; reason = $reason })
+    catch {
+        $sync.Queue.Enqueue(@{
+            kind = 'mode'
+            mode = 'local'
+            reason = ('Mode detection failed: ' + $_.Exception.Message)
+        })
+    }
 }
 
-# Performs the actual scaffold. Mirrors new-claude-project.ps1 exactly.
+# Performs the scaffold through the same module used by the console front end.
 $WorkBody = {
-    param($sync, $Name, $Dest, $Template, $ScriptDir)
+    param($sync, $Name, $Dest, $Template, $ModulePath)
 
     $ErrorActionPreference = 'Stop'
 
-    function Emit($t, $kind) {
-        if (-not $kind) { $kind = 'out' }
-        $sync.Queue.Enqueue(@{ kind = 'log'; text = [string]$t; tone = $kind })
-    }
-
-    # Echo a command, then stream its output line by line. Returns the exit code.
-    # NOTE: $ErrorActionPreference is neutralized to 'Continue' around the native
-    # call. Under 'Stop' (set for this runspace), Windows PowerShell 5.1 turns the
-    # FIRST 2>&1-merged stderr line into a terminating error, so a normal gh/git
-    # run that writes progress to stderr (e.g. "Cloning into ...") would falsely
-    # fail. Restoring in finally keeps the rest of the body strict.
-    function Invoke-Streamed([string]$file, [string[]]$argv, [string]$tone) {
+    function Emit($text, $tone) {
         if (-not $tone) { $tone = 'out' }
-        Emit (("> {0} {1}" -f $file, ($argv -join ' ')).TrimEnd()) 'cmd'
-        $prevEAP = $ErrorActionPreference
-        $ErrorActionPreference = 'Continue'
-        try {
-            & $file @argv 2>&1 | ForEach-Object { Emit ([string]$_) $tone }
-        } finally {
-            $ErrorActionPreference = $prevEAP
-        }
-        return $LASTEXITCODE
+        $sync.Queue.Enqueue(@{ kind = 'log'; text = [string]$text; tone = $tone })
     }
 
     try {
-        $target = Join-Path $Dest $Name
-
-        if (Test-Path -LiteralPath $target) {
-            $sync.Queue.Enqueue(@{ kind = 'done'; success = $false; message = "Folder already exists: $target" })
-            return
+        Import-Module -Force -Name $ModulePath
+        $logger = {
+            param($message, $tone)
+            Emit $message $tone
         }
-        if (-not (Test-Path -LiteralPath $Dest)) {
-            New-Item -ItemType Directory -Force -Path $Dest | Out-Null
-            Emit "Created destination: $Dest" 'dim'
-        }
-
-        # -- decide the mode (re-checked here in case the environment changed) --
-        $ghOk = $false
-        $gh = Get-Command gh -ErrorAction SilentlyContinue
-        if ($gh) {
-            cmd /c "gh auth status >nul 2>&1"
-            if ($LASTEXITCODE -eq 0) { $ghOk = $true }
-        }
-
-        if ($ghOk) {
-            Emit "gh CLI detected and authenticated - creating a private GitHub repo." 'head'
-        } else {
-            Emit "gh CLI unavailable or not signed in - building the project locally instead." 'head'
-        }
-        Emit '' 'out'
-
-        # =====================================================================
-        #  gh mode
-        # =====================================================================
-        if ($ghOk) {
-            Emit ("Creating private repo '{0}' from template {1} ..." -f $Name, $Template) 'head'
-            # Set-Location $Dest so the clone lands directly at $target.
-            Set-Location -LiteralPath $Dest
-            $code = Invoke-Streamed 'gh' @('repo','create',$Name,'--template',$Template,'--private','--clone')
-
-            if ($code -ne 0) {
-                Emit "gh repo create failed - falling back to local copy." 'err'
-                $ghOk = $false
-            } else {
-                # gh clones into .\$Name relative to cwd; move it if different.
-                $cloned = Join-Path (Get-Location).Path $Name
-                if ($cloned -ne $target -and (Test-Path -LiteralPath $cloned)) {
-                    Move-Item -LiteralPath $cloned -Destination $target
-                    Emit "Moved clone into $target" 'dim'
-                }
-                Set-Location -LiteralPath $target
-
-                Emit "Stripping template-only files (bootstrap, README.md) ..." 'out'
-                Invoke-Streamed 'git' @('rm','-rq','--ignore-unmatch','bootstrap') 'dim' | Out-Null
-                Invoke-Streamed 'git' @('rm','-q','--ignore-unmatch','README.md') 'dim' | Out-Null
-                if (Test-Path -LiteralPath 'bootstrap') { Remove-Item -Recurse -Force 'bootstrap' }
-                if (Test-Path -LiteralPath 'README.md') { Remove-Item -Force 'README.md' }
-
-                [IO.File]::WriteAllText((Join-Path $target 'README.md'), "# $Name`r`n", [Text.Encoding]::ASCII)
-                Invoke-Streamed 'git' @('add','README.md') 'dim' | Out-Null
-
-                if (-not (git status --porcelain)) {
-                    Emit "Nothing to clean up." 'dim'
-                } else {
-                    Emit "Committing and pushing ..." 'out'
-                    Invoke-Streamed 'git' @('commit','-qm','Strip template files, add README stub') 'out' | Out-Null
-                    Invoke-Streamed 'git' @('push','-q') 'out' | Out-Null
-                }
-
-                $login = ''
-                try { $login = ([string](& gh api user --jq .login 2>$null)).Trim() } catch {}
-                $remote = "https://github.com/$login/$Name"
-
-                Emit '' 'out'
-                Emit "DONE. Private repo created and cloned:" 'ok'
-                Emit ("  Local:  {0}" -f $target) 'out'
-                Emit ("  Remote: {0}" -f $remote) 'out'
-                Emit '' 'out'
-                Emit "Next: open the folder in Claude Code and run /init-project." 'head'
-                Emit "Codex users: open the folder in Codex; AGENTS.md provides the safety boundary." 'out'
-
-                $sync.Queue.Enqueue(@{ kind = 'done'; success = $true; mode = 'gh'; localPath = $target; remoteUrl = $remote })
-                return
-            }
-        }
-
-        # =====================================================================
-        #  Local fallback mode
-        # =====================================================================
-        $localTemplate = Split-Path -Parent $ScriptDir   # repo root containing the script
-
-        Emit ("Copying template from {0} ..." -f $localTemplate) 'out'
-        $rc = Invoke-Streamed 'robocopy' @($localTemplate, $target, '/E', '/XD', '.git', 'bootstrap', '/XF', 'README.md') 'dim'
-        if ($rc -ge 8) {
-            $sync.Queue.Enqueue(@{ kind = 'done'; success = $false; message = "Copy failed (robocopy exit $rc)." })
-            return
-        }
-
-        Set-Location -LiteralPath $target
-        [IO.File]::WriteAllText((Join-Path $target 'README.md'), "# $Name`r`n", [Text.Encoding]::ASCII)
-        Emit "Initializing git repository ..." 'out'
-        Invoke-Streamed 'git' @('init','-b','main') 'dim' | Out-Null
-        Invoke-Streamed 'git' @('add','-A') 'dim' | Out-Null
-        Invoke-Streamed 'git' @('commit','-qm','Initialize from claude-starter template') 'out' | Out-Null
+        $result = Invoke-NewProject -Name $Name -Dest $Dest -Template $Template -LogAction $logger
 
         Emit '' 'out'
-        Emit ("DONE (local only). Folder ready: {0}" -f $target) 'ok'
+        if ($result.Mode -eq 'gh') {
+            Emit 'DONE. Private repo created and cloned:' 'ok'
+            Emit ("  Local:  {0}" -f $result.LocalPath) 'out'
+            if ($result.RemoteUrl) { Emit ("  Remote: {0}" -f $result.RemoteUrl) 'out' }
+        }
+        else {
+            Emit ("DONE (local only). Folder ready: {0}" -f $result.LocalPath) 'ok'
+            Emit '' 'out'
+            Emit 'To put it on GitHub manually:' 'head'
+            Emit ("  1. Create a PRIVATE repo named '{0}' at https://github.com/new" -f $Name) 'out'
+            Emit '  2. Then run:' 'out'
+            Emit ('       cd "{0}"' -f $result.LocalPath) 'out'
+            Emit ("       git remote add origin https://github.com/<your-username>/{0}.git" -f $Name) 'out'
+            Emit '       git push -u origin main' 'out'
+        }
         Emit '' 'out'
-        Emit "To put it on GitHub manually:" 'head'
-        Emit ("  1. Create a PRIVATE repo named '{0}' at https://github.com/new" -f $Name) 'out'
-        Emit "  2. Then run:" 'out'
-        Emit ('       cd "{0}"' -f $target) 'out'
-        Emit ("       git remote add origin https://github.com/<your-username>/{0}.git" -f $Name) 'out'
-        Emit "       git push -u origin main" 'out'
-        Emit '' 'out'
-        Emit "Next: open the folder in Claude Code and run /init-project." 'head'
-        Emit "Codex users: open the folder in Codex; AGENTS.md provides the safety boundary." 'out'
+        Emit 'Next: open the folder in Claude Code and run /init-project.' 'head'
+        Emit 'Codex users: open the folder in Codex and select the init-project skill.' 'out'
 
-        $sync.Queue.Enqueue(@{ kind = 'done'; success = $true; mode = 'local'; localPath = $target; remoteUrl = $null })
+        $sync.Queue.Enqueue(@{
+            kind = 'done'
+            success = $true
+            mode = $result.Mode
+            localPath = $result.LocalPath
+            remoteUrl = $result.RemoteUrl
+        })
     }
     catch {
-        $sync.Queue.Enqueue(@{ kind = 'done'; success = $false; message = ("Error: " + $_.Exception.Message) })
+        $sync.Queue.Enqueue(@{ kind = 'done'; success = $false; message = ('Error: ' + $_.Exception.Message) })
     }
 }
 
@@ -568,7 +471,7 @@ function Invoke-Background([scriptblock]$body, [object[]]$arguments) {
 function Close-Worker($job) {
     if ($null -eq $job) { return }
     # If the pipeline is still running (e.g. the user closed the window mid
-    # clone/push/robocopy), abort it instead of EndInvoke-ing, which would block
+    # clone, push, or copy), abort it instead of EndInvoke-ing, which would block
     # the UI thread until the external process finishes and freeze the window.
     if ($job.handle -and -not $job.handle.IsCompleted) {
         try { $job.ps.Stop() } catch {}
@@ -596,9 +499,8 @@ function Set-Running($on) {
     }
 }
 
-# Name validation + live target-collision check. Mirrors ^[a-zA-Z0-9._-]+$
-# and additionally rejects all-dot names ('.', '..') that pass the regex but
-# are not usable folder names.
+# Name validation + live target-collision check. The shared module owns the
+# accepted-name contract so the UI and console cannot drift.
 function Update-Validation {
     $name = $script:TxtName.Text
     $dest = $script:TxtDest.Text
@@ -609,13 +511,8 @@ function Update-Validation {
         $script:TxtNameHint.Foreground = $script:MutedBrush
         $ok = $false
     }
-    elseif ($name -notmatch '^[a-zA-Z0-9._-]+$') {
-        $script:TxtNameHint.Text = 'Invalid name - letters, digits, dot, dash, underscore only.'
-        $script:TxtNameHint.Foreground = $script:DangerBrush
-        $ok = $false
-    }
-    elseif ($name -match '^\.+$') {
-        $script:TxtNameHint.Text = 'That name is not a usable folder name.'
+    elseif (-not (Test-NewProjectName -Name $name)) {
+        $script:TxtNameHint.Text = 'Invalid name - use letters, digits, dot, dash, or underscore; all-dot names are not allowed.'
         $script:TxtNameHint.Foreground = $script:DangerBrush
         $ok = $false
     }
@@ -673,7 +570,7 @@ function Start-Create {
     Set-Running $true
 
     Close-Worker $script:workJob
-    $script:workJob = Invoke-Background $WorkBody @($script:sync, $name, $dest, $tmpl, $script:ScriptDir)
+    $script:workJob = Invoke-Background $WorkBody @($script:sync, $name, $dest, $tmpl, $script:CoreModulePath)
 }
 
 $script:TxtName.Add_TextChanged({ Update-Validation })
@@ -772,6 +669,6 @@ $window.Add_Loaded({ $script:TxtName.Focus() | Out-Null })
 Add-LogLine 'Ready. Fill in a project name and press Create.' 'dim'
 Update-Validation
 $script:Timer.Start()
-$script:detectJob = Invoke-Background $DetectBody @($script:sync)
+$script:detectJob = Invoke-Background $DetectBody @($script:sync, $script:CoreModulePath)
 
 [void]$window.ShowDialog()

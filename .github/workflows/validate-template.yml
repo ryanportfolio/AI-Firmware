@@ -29,7 +29,7 @@ jobs:
         shell: pwsh
         run: |
           $bad = $false
-          Get-ChildItem bootstrap -Filter *.ps1 -Recurse | ForEach-Object {
+          Get-ChildItem bootstrap -Include *.ps1,*.psm1 -File -Recurse | ForEach-Object {
             $errs = $null
             [System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$errs) | Out-Null
             if ($errs) {
@@ -58,3 +58,12 @@ jobs:
         run: |
           python3 -m json.tool .claude-plugin/plugin.json > /dev/null
           python3 -m json.tool .claude-plugin/marketplace.json > /dev/null
+
+  generator-smoke:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Local generator and release ZIP work end to end
+        shell: powershell
+        run: .\bootstrap\tests\Test-NewProjectGenerator.ps1
