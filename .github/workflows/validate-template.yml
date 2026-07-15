@@ -48,6 +48,9 @@ jobs:
       - name: Codex skill adapters are current
         run: node .claude/scripts/sync-codex-skills.mjs --check
 
+      - name: Codex starter contract is valid
+        run: node .claude/scripts/test-codex-contract.mjs
+
       - name: settings.json is valid JSON
         run: python3 -m json.tool .claude/settings.json > /dev/null
 

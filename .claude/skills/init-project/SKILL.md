@@ -1,12 +1,18 @@
 ---
-description: One-time first-session setup for a project spawned from the claude-starter template. Use when the user says /init-project, "set up this project", "configure the starter", "initialize the template" — or proactively when you notice CLAUDE.md still contains "FILL IN" template markers at the start of a session. Detects the stack, picks a profile (web / backend / data / writing) that prunes irrelevant skills, fills CLAUDE.md's FILL IN sections via a short Q&A, seeds the reference files, tunes the best-practices catalog, removes template artifacts, and commits.
+description: Use once in a spawned starter repo when the user asks to initialize or configure it, or when FILL IN markers remain; never auto-run in a claude-starter template checkout.
 ---
 
 # init-project — configure a freshly spawned starter project
 
-The starter template ships with placeholder sections that MUST be configured before the kernel rules are trustworthy. This skill is the guided path: detect what's detectable, ask only what isn't, write it all down, commit.
+The starter template ships with placeholder sections that MUST be configured before the kernel rules are trustworthy. This skill is the guided path: detect what's detectable, ask only what isn't, write it down, and verify the setup.
 
-Run it ONCE per project. If `grep -c "FILL IN" CLAUDE.md` returns 0, the project is already configured — say so and exit.
+Run it ONCE per spawned project. If `grep -c "FILL IN" CLAUDE.md` returns 0, the project is already configured — say so and exit.
+
+## Step 0: Confirm this is a spawned project
+
+Check `git remote get-url origin` before changing files. If it points to `ryanportfolio/claude-starter`, this is the canonical template: do not initialize, delete template assets, prune skills, or rewrite its generic defaults. Explain that the markers are intentional and stop.
+
+If the repo still has the canonical `# Agent firmware` README plus both `bootstrap/` and `.claude-plugin/`, ask whether this is a template checkout or maintenance fork versus a spawned project, regardless of its origin name. Do not delete those assets until the user confirms it is spawned. Their answer is authoritative; repository names alone are ambiguous.
 
 ## Step 1: Detect the stack (no questions yet)
 
@@ -17,7 +23,7 @@ Look before asking. Gather from the repo itself:
 - Equivalent manifest reads for other ecosystems.
 - `git remote get-url origin` — the repo path for PR links.
 
-If the repo is EMPTY (fresh spawn, no app code yet), that's fine — note it and skip detection-dependent steps; the user may be about to scaffold. Offer to re-run `/init-project` after scaffolding instead of guessing.
+If the repo is EMPTY (fresh spawn, no app code yet), either configure honest undecided defaults now or defer initialization without changing files until after scaffolding. Do not partially initialize and then promise a second run; configured projects intentionally exit on rerun.
 
 ## Step 2: Ask what detection can't answer
 
@@ -36,7 +42,7 @@ If the user doesn't know yet (brand-new project), write the honest default: "not
 - Replace the **verification** FILL IN section with the real answer from Step 2 (what this sandbox can/can't verify, what the authoritative signal is, what to flag-as-risk instead of claim).
 - Replace the **Environment & Deploy Target** FILL IN section with the deploy target, install policy, migration policy, and hard lines.
 - Delete the `STARTER TEMPLATE NOTE` comment block and every `FILL IN` comment.
-- Delete `.claude-plugin/` — template-only plugin/marketplace manifests; a spawned project is not the marketplace.
+- Delete `.claude-plugin/`, `bootstrap/`, and `.github/workflows/validate-template.yml` — they maintain or distribute the template and must not run in spawned projects. Remove empty `.github/workflows/` and `.github/` directories afterward.
 - Keep the section structure — future sessions navigate by those headings.
 
 ## Step 4: Seed the reference files
@@ -67,7 +73,7 @@ The table is a floor, not a ceiling — offer obvious extras ("no frontend plann
 
 ## Step 6: README
 
-If `README.md` is the spawn stub (`# <name>` only), ask the user for a one-line project description and expand it minimally: name, one-liner, how to run (from `commands.md`). Don't write aspirational docs for code that doesn't exist.
+If `README.md` is the spawn stub (`# <name>` only) or still starts with the canonical `# Agent firmware` heading, ask the user for a one-line project description and replace it minimally: name, one-liner, how to run (from `commands.md`). Don't write aspirational docs for code that doesn't exist.
 
 ## Step 6b: Sync Codex skill adapters
 
@@ -84,15 +90,17 @@ git remote get-url starter || git remote add starter https://github.com/ryanport
 
 This pre-wires `/sync-starter` and lets the session-start hook surface template drift ("starter differs on N files"). Remotes are local git config, not committed — mention that a new clone on another machine needs this line re-run (or the hook's URL-fallback fetch covers it when credentials allow).
 
-## Step 8: Commit
+## Step 8: Finish and optionally ship
 
-Follow the project's git rule: branch (`feat/init-project`), stage exactly the files this skill touched, commit, push, open the PR. Tell the user it's safe to merge immediately — it's configuration, not code.
+Verify that no `FILL IN` markers or template-only paths from Step 3 remain. In Claude Code, follow the project's configured Git rule. In Codex, initialization alone does not authorize commit, push, PR, or merge: perform only the Git actions the user explicitly requested, otherwise leave the verified setup uncommitted and report it.
 
 ## Anti-patterns
 
 - Don't invent deploy facts or sandbox capabilities — wrong kernel rules are worse than FILL IN markers. Ask, or write the honest "undecided" default.
 - Don't run installs just to probe the stack — read manifests instead.
 - Don't leave any `FILL IN` marker behind. `grep -n "FILL IN" CLAUDE.md` must return nothing at the end.
+- Don't initialize a canonical or forked `claude-starter` template checkout; its markers and template assets are intentional.
+- Don't leave template CI or distribution files in a spawned project.
 - Don't pad the reference files with boilerplate prose — they're lookup tables for future sessions, not documentation theater.
 - Don't copy full skills into `.agents/skills/` — generated adapters keep
   `.claude/skills/` as the single source of truth for both runtimes.

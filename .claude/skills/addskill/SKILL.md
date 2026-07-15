@@ -1,5 +1,5 @@
 ---
-description: Add a new skill to this repo so it's available in every Claude Code web session. Use when the user says /addskill, asks to "add a skill", "install a skill", "create a skill", or wants a third-party skill (e.g. superpowers) to show up in the available-skills list. Skills must live in the project's .claude/skills/ folder and be committed — personal/global installs do NOT follow the user into the web sandbox.
+description: Use when the user asks to add, install, or create a repo-local skill that must work in future Claude Code and Codex sessions.
 ---
 
 # Add skill — install a skill into this repo
@@ -63,12 +63,15 @@ Rules of thumb:
 - **Don't reference platform-specific tools** in the body (e.g. "use the Bash tool"). Say "run this command" instead. Skills should work across CLI and web.
 - **`$ARGUMENTS`** is available inside the skill body — that's how the user passes input via `/skillname some text`.
 
-## Step 4: Generate the Codex adapter
+## Step 4: Classify and generate the Codex adapter
+
+Add the new skill exactly once to `.agents/CODEX-SKILL-COMPATIBILITY.md` as Native, Adapted, Capability-gated, Dangerous, or Claude-only. Keep the routing description at 240 characters or fewer and limited to trigger conditions; the full repo catalog must remain small enough for Codex's initial skills budget.
 
 Run:
 
 ```bash
 node .claude/scripts/sync-codex-skills.mjs --write
+node .claude/scripts/test-codex-contract.mjs
 ```
 
 This creates `.agents/skills/<name>/SKILL.md`, a thin Codex-native adapter that
@@ -79,10 +82,12 @@ delegates to the unchanged canonical Claude skill.
 After writing, sanity-check:
 
 - File exists at `.claude/skills/<name>/SKILL.md`
-- Frontmatter parses (single `---` block at the very top, valid YAML)
+- Frontmatter uses one `---` block at the top and passes the supported routing-structure checks
 - `description` field is present and non-empty
-- Skill name folder matches the slash command the user expects
+- Declared skill name, folder, and slash command match
 - Generated adapter exists at `.agents/skills/<name>/SKILL.md`
+- Compatibility matrix contains the skill exactly once
+- Codex contract check passes
 
 You can grep existing skills for shape comparison:
 ```
@@ -97,7 +102,7 @@ Skills only become visible in **future** sessions once they're committed **and m
 Stage only the new skill file(s) — never `git add -A`:
 
 ```
-git add .claude/skills/<skill-name>/SKILL.md .agents/skills/<skill-name>/SKILL.md
+git add .claude/skills/<skill-name>/SKILL.md .agents/skills/<skill-name>/SKILL.md .agents/CODEX-SKILL-COMPATIBILITY.md
 ```
 
 Then invoke the `/merge` skill to commit, push, open the PR, and merge to `main` (with conflict handling and the local main-checkout pull). `/merge` owns the land-on-main logic — don't duplicate it here.
@@ -112,6 +117,7 @@ Tell the user the skill appears in the **next** session — the available-skills
 - Don't put skills in the repo root or a random subfolder — only `.claude/skills/<name>/SKILL.md` is loaded.
 - Don't fabricate the contents of a third-party skill (`superpowers`, etc.) you don't have the source for. Ask the user for the source.
 - Don't skip adapter generation — Codex discovers repo skills from `.agents/skills/`.
+- Don't leave the new skill unclassified or let its routing description push the Codex catalog over budget.
 - Don't stop at pushing the branch. An unmerged branch skill is invisible — sessions read from `main`. Land it via `/merge`.
 - Don't use `git add -A` or `git add .` — stage only the new skill file(s).
 - Don't claim the skill is "now available" in the current session — it isn't until the session reloads.

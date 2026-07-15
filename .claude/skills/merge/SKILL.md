@@ -1,5 +1,5 @@
 ---
-description: Turn on Auto-Merge Mode for the session — going forward, every completed task is automatically committed, pushed, opened as a PR, and merged into main (with conflict resolution), no per-merge confirmation. Use when the user says /merge, "auto-merge for the session", "commit and merge to main going forward", or "keep merging to main as we go".
+description: Use only when the user explicitly asks to enable session-wide automatic commit, push, PR, and merge; not for one-shot shipping requests.
 ---
 
 # Merge — Auto-Merge Mode (Session-Wide)

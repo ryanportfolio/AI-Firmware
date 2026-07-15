@@ -1,6 +1,6 @@
 ---
 name: subagent-driven-development
-description: Use when executing implementation plans with independent tasks in the current session. Supports sequential execution (one task at a time, review-gated) or parallel execution (independent tasks dispatched at once, each writing a disjoint file set, reviewed and committed together at the end)
+description: Use when executing an implementation plan with independent tasks in the current session and exposed multi-agent tools.
 user-invocable: true
 ---
 

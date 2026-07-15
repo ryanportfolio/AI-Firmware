@@ -1,5 +1,5 @@
 ---
-description: Generate a self-contained, copy/paste-ready audit prompt so a SEPARATE fresh session can independently verify a change made in the current session. Use when the user says /handoff-audit, or asks to "double-check this in another session", "have another session verify this", "draft an audit/verification prompt", "hand this off for review", or wants a second pair of eyes with zero shared context. Unlike /impartial-review (which dispatches subagents inside the current session), this produces a prompt the user pastes into a brand-new session — the auditor sees none of this conversation, so the prompt must stand completely on its own.
+description: Use when the user asks for a self-contained audit prompt to paste into a separate fresh session for independent verification.
 ---
 
 # Handoff audit — draft a prompt for a fresh session to verify your work

@@ -1,6 +1,6 @@
 ---
 name: learning
-description: Use at the end of a confirmed-successful problem-solving session where the path from problem to fix took more than one attempt and surfaced gotchas worth carrying forward. Trigger when the user invokes /learning, says "capture learnings", "what did we learn", "save learnings from this session", or after a debug arc finishes (passing tests, accepted fix, shipped feature) and the session contained failed attempts, contradicted assumptions, or revealed stale/missing entries in `.claude/reference/`.
+description: Use after confirmed multi-attempt problem solving reveals durable gotchas, or when the user asks to capture or save session learnings.
 ---
 
 # learning — retrospective synthesis of session lessons

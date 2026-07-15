@@ -1,5 +1,5 @@
 ---
-description: Sync this project with the claude-starter template repo — pull skill/hook/settings improvements down from the template, or push a generic improvement made here back up to it. Use when the user says /sync-starter, "pull template updates", "update skills from starter", "is the starter ahead of us", or "push this skill fix back to the starter". Diff-driven and selective; never bulk-overwrites project-tuned files.
+description: Use when the user asks to pull template improvements into a spawned repo, compare starter drift, or push a generic improvement back to the starter.
 ---
 
 # sync-starter — two-way sync with the claude-starter template
@@ -20,7 +20,7 @@ git fetch starter
 Only these paths are sync candidates:
 
 ```
-git diff --stat HEAD starter/main -- AGENTS.md .claude/skills .claude/hooks .claude/scripts .claude/settings.json
+git diff --stat HEAD starter/main -- AGENTS.md .agents/CODEX-SKILL-COMPATIBILITY.md .claude/skills .claude/hooks .claude/scripts .claude/settings.json
 ```
 
 **Diverged-by-design — NEVER bulk-pull these:**
@@ -30,23 +30,24 @@ git diff --stat HEAD starter/main -- AGENTS.md .claude/skills .claude/hooks .cla
 
 ### Step 3: Present and pick
 
-Group the diff for the user: **new skills** / **changed skills** / **hooks+settings changes**, one line each on what changed (read the actual diff, don't guess from filenames). Ask which to take (plain chat, numbered).
+Group the diff for the user: **new skills** / **changed skills** / **Codex boundary+compatibility** / **hooks+scripts+settings**, one line each on what changed (read the actual diff, don't guess from filenames). Ask which to take (plain chat, numbered).
 
 ### Step 4: Apply selectively
 
 ```
-git checkout starter/main -- .claude/skills/<picked>/ .claude/hooks/<picked>
+git checkout starter/main -- <picked-paths>
 ```
 
 For `settings.json`: merge, don't overwrite — the project may have its own permission additions. Read both, union the `allow` lists, keep project-specific hooks.
 
-After any skill or `skillOverrides` change, run
-`node .claude/scripts/sync-codex-skills.mjs --write`. Stage the generated
-`.agents/skills/` changes with the canonical skill changes.
+After any skill, generator, compatibility matrix, or `skillOverrides` change, run
+`node .claude/scripts/sync-codex-skills.mjs --write` and
+`node .claude/scripts/test-codex-contract.mjs`. Stage generated
+`.agents/skills/` changes even when only the generator changed, along with the selected pulled paths.
 
 ### Step 5: Ship
 
-Branch, stage exactly the pulled paths, commit (`Sync from claude-starter: <what>`), push, PR — per the project's git rule.
+Branch, stage exactly the selected pulled paths plus regenerated adapter paths, commit (`Sync from claude-starter: <what>`), push, PR — per the project's git rule.
 
 ## Direction B: Push a generic improvement back to the template
 

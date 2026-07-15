@@ -1,5 +1,5 @@
 ---
-description: Build a throwaway, self-contained HTML "lab" to prototype and live-tune a visual or feel element BEFORE writing it into real code — game juice (particles, hit-flash, screen shake, weapon/enemy feel, color, timing) or web/UI work (a component, layout, spacing scale, type, color, motion, a page redesign). Use when the user says /lab, "lab it", "let's lab this", "make a lab for", "prototype this first", "let me tune it", or wants to eyeball/dial-in an element with live sliders before committing it to the codebase. The lab puts real knobs in front of the user so THEY tune the feel; you then port the exact values into real code and DELETE the lab.
+description: Use when the user explicitly asks to lab or prototype a visual, UI, motion, or game-feel element with live tuning before production implementation.
 ---
 
 # lab — live-tune an element in an isolated sandbox, then port + delete

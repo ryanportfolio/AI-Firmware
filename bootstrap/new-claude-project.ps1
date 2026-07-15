@@ -54,17 +54,26 @@ if ($ghOk) {
         if ($cloned -ne $target -and (Test-Path $cloned)) { Move-Item $cloned $target }
         # Strip template-only files, drop in a README stub
         Push-Location $target
-        git rm -rq --ignore-unmatch bootstrap
+        git rm -rq --ignore-unmatch bootstrap .claude-plugin .github/workflows/validate-template.yml
+        if ($LASTEXITCODE -ne 0) { throw "Failed to remove template-only files." }
         git rm -q --ignore-unmatch README.md
+        if ($LASTEXITCODE -ne 0) { throw "Failed to replace the template README." }
         if (Test-Path 'bootstrap') { Remove-Item -Recurse -Force bootstrap }
+        if (Test-Path '.claude-plugin') { Remove-Item -Recurse -Force .claude-plugin }
+        if (Test-Path '.github\workflows\validate-template.yml') { Remove-Item -Force '.github\workflows\validate-template.yml' }
         if (Test-Path 'README.md') { Remove-Item -Force README.md }
         [IO.File]::WriteAllText((Join-Path (Get-Location).Path 'README.md'), "# $Name`r`n", [Text.Encoding]::ASCII)
         git add README.md
-        if (-not (git status --porcelain)) {
+        if ($LASTEXITCODE -ne 0) { throw "Failed to stage the replacement README." }
+        $pendingChanges = git status --porcelain
+        if ($LASTEXITCODE -ne 0) { throw "Failed to inspect template cleanup changes." }
+        if (-not $pendingChanges) {
             Write-Host "Nothing to clean up." -ForegroundColor DarkGray
         } else {
             git commit -qm "Strip template files, add README stub"
+            if ($LASTEXITCODE -ne 0) { throw "Failed to commit template cleanup." }
             git push -q
+            if ($LASTEXITCODE -ne 0) { throw "Failed to push template cleanup." }
         }
         Pop-Location
         Write-Host ""
@@ -73,7 +82,7 @@ if ($ghOk) {
         Write-Host "  Remote: https://github.com/$((gh api user --jq .login))/$Name"
         Write-Host ""
         Write-Host "Next: open the folder in Claude Code and run /init-project."
-        Write-Host "Codex users: open the folder in Codex; AGENTS.md provides the safety boundary."
+        Write-Host "Codex users: open the folder in Codex and select the init-project skill."
         exit 0
     }
 }
@@ -83,14 +92,17 @@ Write-Host "gh CLI unavailable - building the project locally instead." -Foregro
 $localTemplate = Split-Path -Parent $PSScriptRoot   # repo root containing this script
 
 Write-Host "Copying template from $localTemplate ..." -ForegroundColor Cyan
-robocopy $localTemplate $target /E /XD .git bootstrap /XF README.md | Out-Null
+robocopy $localTemplate $target /E /XD .git bootstrap .claude-plugin /XF README.md validate-template.yml | Out-Null
 if ($LASTEXITCODE -ge 8) { Write-Host "Copy failed." -ForegroundColor Red; exit 1 }
 
 Push-Location $target
 [IO.File]::WriteAllText((Join-Path (Get-Location).Path 'README.md'), "# $Name`r`n", [Text.Encoding]::ASCII)
 git init -b main | Out-Null
+if ($LASTEXITCODE -ne 0) { throw "Failed to initialize the local repository." }
 git add -A
+if ($LASTEXITCODE -ne 0) { throw "Failed to stage the local template copy." }
 git commit -qm "Initialize from claude-starter template"
+if ($LASTEXITCODE -ne 0) { throw "Failed to commit the local template copy." }
 Pop-Location
 
 Write-Host ""
@@ -104,4 +116,4 @@ Write-Host "       git remote add origin https://github.com/<your-username>/$Nam
 Write-Host "       git push -u origin main"
 Write-Host ""
 Write-Host "Next: open the folder in Claude Code and run /init-project."
-Write-Host "Codex users: open the folder in Codex; AGENTS.md provides the safety boundary."
+Write-Host "Codex users: open the folder in Codex and select the init-project skill."

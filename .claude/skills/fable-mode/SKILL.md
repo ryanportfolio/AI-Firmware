@@ -1,12 +1,6 @@
 ---
 name: fable-mode
-description: Use PROACTIVELY the moment you notice a task has many layers - multiple dependent steps,
-unknowns that could change the approach, debugging where the first theory might be wrong, or anything
-that needs verification before handoff. Also use when a task keeps failing or stalling, or when Nate
-says "fable mode", "think like Fable", "use the Fable skill", "use the Fable method", "work like
-Fable", "slow down and do this right", or "think this through first". Loads Fable 5's working
-discipline (the five-gate task loop plus standing habits) so any session, especially one running on
-Opus 4.8 or Sonnet 5, applies it.
+description: Use proactively for hard layered work with dependent steps, load-bearing unknowns, repeated failures, or verification-sensitive handoff; also when the user asks for Fable mode.
 ---
 
 # The Fable Method

@@ -1,5 +1,5 @@
 ---
-description: Honest second look at the recommendation the model just made — why it matters, the real reasoning behind it, and (the point) what it could be missing, quick and well-rounded. ONLY use when the user explicitly types the `/why` slash command. Do NOT trigger on the bare word "why" in ordinary conversation, nor on natural-language paraphrases like "why did you recommend that" — manual slash invocation only. Reviews the recommendation in the assistant's immediately-preceding turn (the message right before the user's). Dispatches one fresh Opus subagent, fed only that recommendation, to hunt blind spots with genuine distance, then synthesizes a concise review that surfaces real weaknesses instead of just defending the pick. Lightweight — a single scoped reviewer, not the multi-agent /impartial-review.
+description: Use only when the user explicitly invokes /why to challenge the assistant's immediately prior recommendation; never trigger from ordinary why questions or paraphrases.
 ---
 
 # Why

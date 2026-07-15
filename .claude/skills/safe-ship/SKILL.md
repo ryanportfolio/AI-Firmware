@@ -1,5 +1,5 @@
 ---
-description: End-to-end safe shipping workflow — audit working tree, branch off main if needed, stage only intended files, verify, commit, push, open PR. Use when the user says /safe-ship, asks to "ship these changes", "commit and PR", "make a PR for this", "open a PR for these changes", or otherwise wants the entire commit-to-PR pipeline run safely. Prevents direct-to-main commits, accidental staging of personal/secret files, missed verification, and other procedural slips this project's CLAUDE.md forbids.
+description: Use when the user explicitly asks to ship changes end to end, including scope audit, branch, verification, commit, push, and pull request.
 disable-model-invocation: true
 ---
 

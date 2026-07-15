@@ -46,7 +46,9 @@ One repo learns. The next repo should not start dumb.
 Codex discovers thin adapters under `.agents/skills/`. Each adapter delegates to
 the matching canonical `.claude/skills/` workflow, so both runtimes use one
 source of truth. `AGENTS.md` defines the safety boundary. Codex does not run
-Claude SessionStart hooks.
+Claude SessionStart hooks. The starter intentionally has no project Codex hook:
+`AGENTS.md` already loads natively, while command hooks add a separate trust and
+platform-failure surface.
 
 ## use it
 
@@ -99,7 +101,7 @@ same skills without the namespace.
 |---|---|
 | `CLAUDE.md` | Claude Code kernel rules loaded every turn: verification, git workflow, subagent discipline, and context restraint. Two placeholder sections are filled per project by `/init-project`. |
 | `AGENTS.md` | Codex boundary. Inherits project facts without inheriting Claude-only hooks or automatic git behavior. |
-| `.claude/skills/` | 32 canonical Markdown playbooks used by Claude Code and Codex. |
+| `.claude/skills/` | Canonical Markdown playbooks used by Claude Code and Codex. |
 | `.agents/skills/` | Generated Codex-native adapters; metadata only, no duplicated workflow bodies. |
 | `.claude/reference/` | Durable project memory: secrets, architecture, pitfalls, commands, tech stack, and deployment notes. |
 | `.claude/hooks/session-start.sh` | Claude Code SessionStart hook for drift checks, overlap warnings, and Claude-specific defaults. |
@@ -182,7 +184,7 @@ The script copies missing files only. `-Force` overwrites. `-DryRun` previews.
 
 - Claude Code for the full template and plugin workflow.
 - Codex uses `AGENTS.md` and native `.agents/skills/` adapters. It does not run
-  Claude SessionStart hooks.
+  Claude SessionStart hooks or need a project hook to load repository guidance.
 - `gh` CLI is optional for the Windows project creator. Without it, the script
   falls back to a local copy plus printed GitHub steps.
 - Bootstrap is Windows-first PowerShell. The Claude session hook is Bash and is

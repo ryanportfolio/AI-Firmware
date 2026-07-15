@@ -1,12 +1,12 @@
 # Codex Instructions
 
-This is the Codex boundary for the AI Operating System starter. Claude Code keeps using `CLAUDE.md` and `.claude/` unchanged.
+This is the Codex boundary for repositories using the AI Operating System starter. Claude Code keeps using `CLAUDE.md` and `.claude/` unchanged.
 
 ## Defaults
 
 - Use Caveman Ultra for prose from the first reply, without asking or requiring `$caveman`. Keep code, commands, identifiers, errors, commits, PR text, and files normal.
 - Use plain prose for security warnings, irreversible confirmations, and ambiguous multi-step decisions, then resume Ultra. A new session restores Ultra after the user temporarily disables it.
-- Read `CLAUDE.md` for project facts, architecture, verification, references, and engineering rules. Do not inherit Claude popup rules, hook implementation, model names, slash syntax, or automatic Git behavior.
+- Read only `CLAUDE.md`'s Verification and Environment & Deploy Target sections for configured project facts. Use `.claude/reference/` for architecture, commands, deployment, and pitfalls. Other `CLAUDE.md` workflow rules are not Codex instructions.
 - Never execute `.claude/hooks/session-start.sh` in Codex.
 
 ## Capabilities
@@ -14,7 +14,7 @@ This is the Codex boundary for the AI Operating System starter. Claude Code keep
 - Inspect tools exposed in the current session before using subagents, browser control, connectors, or interactive input. Config flags alone are not proof.
 - Serial fallback is valid only when independence is not part of the deliverable. `impartial-review`, `advocate`, and `why` require fresh independent context; if unavailable, report the gap.
 - Claude `Workflow` programs are not Codex programs. Recreate their intent with exposed Codex agents or flag them blocked.
-- Codex hooks may reinforce this file, but critical rules stay here because hooks depend on trust and feature availability.
+- Keep critical Codex rules here rather than in project hooks, which require separate trust and can be disabled.
 
 ## RTK
 
@@ -39,4 +39,4 @@ This is the Codex boundary for the AI Operating System starter. Claude Code keep
 
 ## Starter Maintenance
 
-Keep `bootstrap/` PowerShell 5.1 files ASCII-only and shell scripts LF. Claude gets its hooks and slash skills; Codex gets `AGENTS.md`, `.codex/`, and `.agents/skills/`. Keep private paths, tokens, and maintainer-only workflow out of defaults.
+Only in the canonical `claude-starter` template repository: keep `bootstrap/` PowerShell 5.1 files ASCII-only and shell scripts LF. Claude gets its hooks and slash skills; Codex gets `AGENTS.md` and `.agents/skills/`. Keep private paths, tokens, and maintainer-only workflow out of defaults.
