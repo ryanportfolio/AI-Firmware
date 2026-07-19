@@ -49,11 +49,11 @@ If `mergeable` is `CONFLICTING` or the merge is blocked by divergence:
 
 ### 6. Merge into main
 ```
-gh pr merge <number> --merge
+gh pr merge <number> --squash
 ```
-- `--merge` → merge commit (matches this repo's `Merge pull request #...` history).
+- `--squash` → squash-merge is the **default** for this repo; the PR's commits collapse into one commit on `main`.
 - **No `--delete-branch`** — the one session branch is kept until the session is done.
-- **No `--squash` / `--rebase`** unless the user explicitly asked.
+- **No `--merge` / `--rebase`** unless the user explicitly asked — squash is the default.
 - **No `--admin`** — do not bypass branch protection or failing required checks. If the merge is blocked by checks/protection, report why and stop (pause the cycle for that task); do not force it.
 
 ### 7. Report
@@ -76,9 +76,9 @@ Turn the mode OFF when the user says "stop merge", "stop auto-merge", "normal mo
 - Don't merge mid-task, exploratory, or unverified work — "complete + verified" is the gate.
 - Don't fabricate verification just to trigger the cycle.
 - Don't blanket-commit unrelated files — stage only what the task touched.
-- Don't push merge commits straight to `main` via `git push` — always integrate through `gh pr merge` so history stays `Merge pull request #...`.
+- Don't push straight to `main` via `git push` — always integrate through `gh pr merge`.
 - Don't delete the branch (`--delete-branch`) — one branch for the whole session.
-- Don't switch merge method (`--squash`/`--rebase`) on your own.
+- Don't switch away from squash (to `--merge`/`--rebase`) on your own — squash is the default; other methods need an explicit ask.
 - Don't bypass protections/checks (`--admin`) without an explicit ask — report the block and stop.
 - Don't guess on semantic merge conflicts — resolve the unambiguous ones, stop and ask on the rest.
 - Don't fabricate success — report the real `gh pr merge` / `git merge` outcome.

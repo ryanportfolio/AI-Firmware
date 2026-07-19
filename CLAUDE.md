@@ -49,6 +49,7 @@ Defaults until configured:
 
 * One open PR per unit of work; update it, never open a second. Before opening a PR, check for an existing open one (gh pr list --head <branch>) and push to that instead. 
 
+- Merge PRs with **squash** by default (`gh pr merge --squash`); merge-commit or rebase only when the user explicitly asks.
 - Never force-push or run destructive git operations without an explicit request.
 - "Complete" = the requested change finished and verified to this environment's limits. Mid-task or exploratory work is NOT a commit trigger.
 - End commit messages with the standard `Co-Authored-By:` trailer.
