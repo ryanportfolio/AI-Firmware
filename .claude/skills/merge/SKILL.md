@@ -31,9 +31,10 @@ Run this whenever a task is complete and verified. "Complete" = the requested ch
 - Commit with a clear message; end with the standard `Co-Authored-By:` trailer.
 - `git push` (set upstream on first push of the branch).
 
-### 3. Ensure a PR exists
-- `gh pr view --json number,title,state,mergeable,mergeStateStatus,headRefName,baseRefName,url`.
-- If no PR, or the prior PR is already `MERGED`/`CLOSED` (a reused branch's old PR closes after each merge), open a fresh one: `gh pr create --base main --fill` (or use the `pr` skill). Confirm `baseRefName` is `main`.
+### 3. Ensure a PR exists — reuse the open one, never open a second
+- Check for an existing **open** PR on this branch first: `gh pr list --head "$(git branch --show-current)" --state open --json number,url`.
+- If one is open, that IS the PR for this unit of work — the `git push` in step 2 already updated it. Do not open another. **One open PR per unit of work.**
+- Open a fresh PR only when none is open — the branch has no PR yet, or its prior PR is `MERGED`/`CLOSED` (a reused branch's old PR closes after each merge): `gh pr create --base main --fill` (or use the `pr` skill). Confirm `baseRefName` is `main`.
 
 ### 4. Sync with main + check conflicts
 - `git fetch origin`.
@@ -76,6 +77,7 @@ Turn the mode OFF when the user says "stop merge", "stop auto-merge", "normal mo
 - Don't merge mid-task, exploratory, or unverified work — "complete + verified" is the gate.
 - Don't fabricate verification just to trigger the cycle.
 - Don't blanket-commit unrelated files — stage only what the task touched.
+- Don't open a second PR for a branch that already has an open one — reuse it (`gh pr list --head <branch>` first). One open PR per unit of work.
 - Don't push straight to `main` via `git push` — always integrate through `gh pr merge`.
 - Don't delete the branch (`--delete-branch`) — one branch for the whole session.
 - Don't switch away from squash (to `--merge`/`--rebase`) on your own — squash is the default; other methods need an explicit ask.
