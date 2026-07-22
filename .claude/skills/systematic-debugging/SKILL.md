@@ -58,11 +58,19 @@ You MUST complete each phase before proceeding to the next.
    - Read stack traces completely
    - Note line numbers, file paths, error codes
 
-2. **Reproduce Consistently**
-   - Can you trigger it reliably?
-   - What are the exact steps?
-   - Does it happen every time?
-   - If not reproducible → gather more data, don't guess
+2. **Build a Red-Capable Feedback Loop**
+
+   Name **one command** — a test, curl script, CLI invocation, headless-browser script, or replay harness — that you have **already run at least once** and that goes red on THIS bug:
+   - **Red-capable**: asserts the user's exact symptom, not "runs without erroring"
+   - **Deterministic**: same verdict every run
+   - **Fast**: seconds, not minutes
+   - Non-deterministic bug? Don't chase a clean repro — raise the reproduction rate (loop the trigger 100×, parallelize, add stress, inject sleeps) until it's debuggable. A 50% flake is debuggable; 1% is not.
+
+   Then **tighten** the loop: faster (cache setup, narrow test scope), sharper (assert the specific symptom), more deterministic (pin time, seed RNG, isolate filesystem).
+
+   Then **minimise**: cut inputs, config, data, and steps one at a time, re-running after each cut, until every remaining element is load-bearing — removing any one makes the loop go green. A minimal repro shrinks the hypothesis space and becomes the regression test.
+
+   Genuinely cannot build a loop? Say so explicitly, list what you tried, and ask for a captured artifact (HAR file, log dump, recording) or repro access. Reading code to build a theory before this command exists is the exact failure this process prevents.
 
 3. **Check Recent Changes**
    - What changed that could cause this?
@@ -108,6 +116,10 @@ You MUST complete each phase before proceeding to the next.
 
    **This reveals:** Which layer fails (secrets → workflow ✓, workflow → build ✗)
 
+   **Tag every debug log with a unique prefix** (e.g. `[DEBUG-a4f2]`) — cleanup at the end becomes a single grep. Untagged logs survive into production; tagged logs die.
+
+   **Performance regressions:** logs are usually the wrong tool. Establish a baseline measurement (timing harness, profiler, query plan), then bisect. Measure first, fix second.
+
 5. **Trace Data Flow**
 
    **WHEN error is deep in call stack:**
@@ -147,14 +159,16 @@ You MUST complete each phase before proceeding to the next.
 
 **Scientific method:**
 
-1. **Form Single Hypothesis**
-   - State clearly: "I think X is the root cause because Y"
-   - Write it down
-   - Be specific, not vague
+1. **Generate 3–5 Ranked Hypotheses**
+   - Single-hypothesis generation anchors on the first plausible idea
+   - Each must be falsifiable — state its prediction: "If X is the cause, then changing Y will make the bug disappear"
+   - Can't state the prediction? It's a vibe — discard or sharpen it
+   - If your human partner is around, show them the ranked list before testing — domain knowledge re-ranks instantly ("we just deployed a change to #3"). Don't block on it if they're AFK.
 
-2. **Test Minimally**
-   - Make the SMALLEST possible change to test hypothesis
+2. **Test Minimally, Top-Ranked First**
+   - Make the SMALLEST possible change to test the hypothesis
    - One variable at a time
+   - Each probe maps to a specific prediction from step 1
    - Don't fix multiple things at once
 
 3. **Verify Before Continuing**
@@ -173,11 +187,12 @@ You MUST complete each phase before proceeding to the next.
 **Fix the root cause, not the symptom:**
 
 1. **Create Failing Test Case**
-   - Simplest possible reproduction
-   - Automated test if possible
+   - Simplest possible reproduction (the minimised repro from Phase 1)
+   - Automated test if possible, at a **correct seam** — one where the test exercises the real bug pattern as it occurs at the call site
    - One-off test script if no framework
    - MUST have before fixing
    - Use the `superpowers:test-driven-development` skill for writing proper failing tests
+   - **No correct seam exists?** (only shallow seams that can't replicate the triggering pattern — a test there gives false confidence.) That is itself the finding: the architecture is preventing the bug from being locked down. Document it and flag the architecture instead of writing a misleading test.
 
 2. **Implement Single Fix**
    - Address the root cause identified

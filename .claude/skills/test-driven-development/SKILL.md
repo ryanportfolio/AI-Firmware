@@ -196,6 +196,12 @@ Keep tests green. Don't add behavior.
 
 Next failing test for next feature.
 
+## Where Tests Go: Seams
+
+A **seam** is the public boundary you test at — the interface where you observe behavior without reaching inside. Tests live at seams, never against internals. Code can change entirely; tests shouldn't.
+
+**Agree the seams before writing tests.** Ask: "What's the public interface, and which seams should we test?" You can't test everything — pre-agreed seams put testing effort on critical paths and complex logic instead of every edge case. Write no test at an unconfirmed seam.
+
 ## Good Tests
 
 | Quality | Good | Bad |
@@ -361,6 +367,11 @@ When adding mocks or test utilities, read @testing-anti-patterns.md to avoid com
 - Testing mock behavior instead of real behavior
 - Adding test-only methods to production classes
 - Mocking without understanding dependencies
+
+Two more to catch in any test you write:
+
+- **Tautological** — the assertion recomputes the expected value the way the code does (`expect(add(a, b)).toBe(a + b)`, a snapshot derived by hand the same way), so it passes by construction and can never disagree with the code. Expected values must come from an independent source of truth: a known-good literal, a worked example, the spec.
+- **Horizontal slicing** — writing all tests first, then all implementation. Bulk tests verify *imagined* behavior and commit you to test structure before understanding the implementation. Work in vertical slices: one test → one implementation → repeat, each test responding to what the last cycle taught you.
 
 ## Final Rule
 
