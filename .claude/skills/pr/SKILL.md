@@ -1,6 +1,9 @@
 ---
 description: Push current branch changes to GitHub and provide a PR comparison link. Use when the user says /pr, asks to create a PR, or wants to push their changes.
+model: haiku
 ---
+
+> `model: haiku` — this skill is mechanical (stage, commit, push, link) and is always the last action of a turn. The override downgrades the rest of the turn, so do NOT invoke this skill mid-workflow from another skill; run the git/gh commands directly instead.
 
 # PR — Push & Create PR Link
 

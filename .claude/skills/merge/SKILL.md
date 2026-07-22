@@ -34,7 +34,7 @@ Run this whenever a task is complete and verified. "Complete" = the requested ch
 ### 3. Ensure a PR exists — reuse the open one, never open a second
 - Check for an existing **open** PR on this branch first: `gh pr list --head "$(git branch --show-current)" --state open --json number,url`.
 - If one is open, that IS the PR for this unit of work — the `git push` in step 2 already updated it. Do not open another. **One open PR per unit of work.**
-- Open a fresh PR only when none is open — the branch has no PR yet, or its prior PR is `MERGED`/`CLOSED` (a reused branch's old PR closes after each merge): `gh pr create --base main --fill` (or use the `pr` skill). Confirm `baseRefName` is `main`.
+- Open a fresh PR only when none is open — the branch has no PR yet, or its prior PR is `MERGED`/`CLOSED` (a reused branch's old PR closes after each merge): `gh pr create --base main --fill`. Confirm `baseRefName` is `main`. (Do not invoke the `pr` skill here — it carries a `model: haiku` override that would downgrade the rest of this cycle, including conflict resolution.)
 
 ### 4. Sync with main + check conflicts
 - `git fetch origin`.
@@ -56,6 +56,10 @@ gh pr merge <number> --squash
 - **No `--delete-branch`** — the one session branch is kept until the session is done.
 - **No `--merge` / `--rebase`** unless the user explicitly asked — squash is the default.
 - **No `--admin`** — do not bypass branch protection or failing required checks. If the merge is blocked by checks/protection, report why and stop (pause the cycle for that task); do not force it.
+
+### 6.5. Post-merge verification
+- **Stranded-push check:** `git fetch origin` then `git log origin/main..HEAD --oneline`. Must be empty. A commit pushed *after* the squash-merge never reaches `main` (that PR is already `MERGED`); any commits listed did NOT land — flag them in the report and let the next cycle open a fresh PR for them. Never assume a post-merge push landed.
+- **Primary-checkout sync:** if this session runs in a worktree or secondary clone, `git pull` `main` in the primary checkout the user actually runs from — the merged PR alone does not update those working files.
 
 ### 7. Report
 Confirm the merge landed, give the PR URL, note the branch was kept. If anything blocked it (failing checks, protection, unresolved/ambiguous conflict), report the exact `gh`/`git` output and the reason — never claim success you did not verify.
